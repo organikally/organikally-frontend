@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-surface text-ink font-sans antialiased;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+  }
+  /* Honor device safe areas (notch / home indicator). */
+  #root {
+    padding-top: env(safe-area-inset-top);
+  }
+  /* Inputs: 16px min to prevent iOS zoom-on-focus. */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+  ::selection {
+    background: #c9a22733;
+  }
+}
+
+@layer components {
+  .wordmark {
+    @apply font-serif font-semibold tracking-tight;
+  }
+
+  /* Generous tap targets everywhere (field tool on cheap phones). */
+  .tap {
+    @apply min-h-tap min-w-tap;
+  }
+
+  .card {
+    @apply rounded-card bg-white shadow-card border border-line;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill px-5
+      min-h-tap font-semibold transition-colors active:scale-[0.98]
+      disabled:opacity-50 disabled:pointer-events-none select-none;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-cream hover:bg-forest;
+  }
+  .btn-gold {
+    @apply btn bg-gold text-charcoal hover:bg-gold-bright;
+  }
+  .btn-outline {
+    @apply btn border-2 border-brand text-brand bg-transparent hover:bg-brand/5;
+  }
+  .btn-ghost {
+    @apply btn text-ink hover:bg-surface-2;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-cream hover:opacity-90;
+  }
+
+  .field-label {
+    @apply block text-sm font-semibold text-ink mb-1.5;
+  }
+  .field-input {
+    @apply w-full rounded-card border border-line bg-white px-4 py-3
+      min-h-tap text-ink placeholder:text-muted
+      focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1 rounded-pill px-2.5 py-1 text-xs
+      font-semibold whitespace-nowrap;
+  }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+  .h-screen-safe {
+    height: 100dvh;
+  }
+  .scroll-touch {
+    -webkit-overflow-scrolling: touch;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
