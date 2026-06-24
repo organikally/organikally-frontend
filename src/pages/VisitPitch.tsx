@@ -3,7 +3,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Input';
-import { Spinner, EmptyState } from '@/components/ui/Spinner';
+import { Skeleton, EmptyState } from '@/components/ui/Spinner';
 import { VisitStepper } from '@/components/domain/VisitStepper';
 import { useVisitFlow } from '@/stores/visitFlow';
 import { useCatalog } from '@/features/catalog/data';
@@ -39,11 +39,26 @@ export function VisitPitch() {
       </div>
       <div className="space-y-4 p-4 pt-0">
         <Card>
-          <h3 className="mb-2 font-semibold text-ink">Products demoed</h3>
+          <h2 className="mb-2.5 font-display text-lg text-ink">Products demoed</h2>
           {isLoading ? (
-            <div className="flex justify-center py-6">
-              <Spinner />
+            <div className="space-y-2" aria-busy aria-label="Loading">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 rounded-card border border-line p-3"
+                >
+                  <Skeleton className="h-6 w-6 shrink-0 rounded-chip" />
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                </div>
+              ))}
             </div>
+          ) : (catalog ?? []).length === 0 ? (
+            <p className="py-4 text-center text-sm text-ink-faint">
+              No products in the catalog yet.
+            </p>
           ) : (
             <div className="space-y-2">
               {(catalog ?? []).map((sku) => {
@@ -55,15 +70,15 @@ export function VisitPitch() {
                     className={cn(
                       'flex w-full items-center gap-3 rounded-card border p-3 text-left',
                       on
-                        ? 'border-brand bg-brand/5'
-                        : 'border-line bg-white',
+                        ? 'border-gold-ink bg-yellow/10'
+                        : 'border-line bg-paper',
                     )}
                   >
                     <span
                       className={cn(
-                        'flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2',
+                        'flex h-6 w-6 shrink-0 items-center justify-center rounded-chip border',
                         on
-                          ? 'border-brand bg-brand text-cream'
+                          ? 'border-gold-ink bg-gold-ink text-paper'
                           : 'border-line',
                       )}
                     >
@@ -73,7 +88,7 @@ export function VisitPitch() {
                       <span className="block truncate font-medium text-ink">
                         {sku.name}
                       </span>
-                      <span className="text-xs text-muted">
+                      <span className="text-xs text-ink-faint">
                         {sku.pack_size} · {sku.category}
                       </span>
                     </span>

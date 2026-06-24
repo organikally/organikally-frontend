@@ -6,7 +6,7 @@ import { hasNativeBridge } from '@/lib/bridge/client';
 export function DevModeBanner() {
   if (hasNativeBridge()) return null;
   return (
-    <div className="bg-charcoal px-3 py-1 text-center text-[11px] font-semibold tracking-wide text-gold-bright">
+    <div className="bg-ink px-3 py-1 text-center text-[11px] font-semibold tracking-wide text-yellow">
       DEV MODE · browser fallback (no native camera/GPS/secure-store)
     </div>
   );

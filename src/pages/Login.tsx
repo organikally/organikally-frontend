@@ -22,19 +22,19 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen-safe flex-col bg-forest text-cream">
+    <div className="flex min-h-screen-safe flex-col bg-ink text-paper">
       <div className="flex flex-1 flex-col justify-center px-6 py-10">
         <div className="mx-auto w-full max-w-sm">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-card bg-gold">
-              <span className="wordmark text-3xl text-forest">O</span>
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-card bg-yellow shadow-oil">
+              <span className="wordmark text-3xl text-ink">O</span>
             </div>
-            <h1 className="wordmark text-3xl text-cream">Organikally</h1>
-            <p className="mt-1 text-sm text-cream/70">Field Sales</p>
+            <h1 className="wordmark text-3xl text-paper">Organikally</h1>
+            <p className="mt-1 text-sm text-paper/70">Field Sales</p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            <div className="rounded-card bg-cream p-5 text-ink shadow-card-lg">
+            <div className="rounded-card bg-paper p-5 text-ink shadow-lg">
               <Input
                 label="Email"
                 type="email"
@@ -72,7 +72,7 @@ export function Login() {
             </div>
           </form>
 
-          <p className="mt-6 text-center text-xs text-cream/60">
+          <p className="mt-6 text-center text-xs text-paper/60">
             {hasNativeBridge()
               ? 'Native device features enabled'
               : 'Browser mode · demo: rep.delhi@organikally.in / Organikally@123'}

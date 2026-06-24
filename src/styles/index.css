@@ -3,16 +3,36 @@
 @tailwind utilities;
 
 @layer base {
+  /* Brand DNA tokens — DESIGN_SYSTEM §1. Warm tinted neutrals, never pure #000/#fff. */
   :root {
+    --paper: 250 249 245; /* #FAF9F5 base surface, warm off-white */
+    --surface: 244 241 233; /* #F4F1E9 raised panel — the ONE solid panel tint */
+    --yellow: 240 182 26; /* #F0B61A the oil — primary accent */
+    --yellow-deep: 206 150 10; /* #CE960A hover/active depth */
+    --gold-ink: 146 100 9; /* #926409 AA-safe gold TEXT on paper */
+    --ink: 28 25 18; /* #1C1912 warm near-black, headings + body */
+    --ink-muted: 64 57 44; /* #40392C secondary text (AA) */
+    --ink-faint: 122 114 98; /* #7A7262 captions, indices, placeholders */
+    --line: 230 224 211; /* #E6E0D3 hairline rule on paper */
+    /* Semantic status — functional only, warm, desaturated, AA on paper */
+    --success: 27 94 32; /* #1B5E20 organic green */
+    --warning: 146 100 9; /* = gold-ink */
+    --danger: 155 44 44; /* #9B2C2C warm brick */
+    --info: 44 122 123; /* #2C7A7B muted teal */
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 0.2s;
+    --dur: 0.45s;
     color-scheme: light;
   }
+
   html,
   body,
   #root {
     height: 100%;
   }
   body {
-    @apply bg-surface text-ink font-sans antialiased;
+    @apply bg-paper text-ink font-sans antialiased;
+    letter-spacing: -0.002em;
     -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
     overscroll-behavior-y: none;
@@ -28,14 +48,39 @@
   button {
     font-size: 16px;
   }
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    letter-spacing: 0;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
   ::selection {
-    background: #c9a22733;
+    background: rgb(var(--yellow));
+    color: rgb(var(--ink));
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 @layer components {
+  /* App wordmark — Chelsea Market display face. */
   .wordmark {
-    @apply font-serif font-semibold tracking-tight;
+    @apply font-display;
+    letter-spacing: 0;
   }
 
   /* Generous tap targets everywhere (field tool on cheap phones). */
@@ -43,52 +88,84 @@
     @apply min-h-tap min-w-tap;
   }
 
+  /* Card / Panel — hairline + paper, warm shadow, card radius (DESIGN_SYSTEM §4). */
   .card {
-    @apply rounded-card bg-white shadow-card border border-line;
+    @apply rounded-card border border-line bg-paper shadow-sm;
   }
 
+  /* Button — pill, 44px field target, semibold, ease-brand 300ms (§4). */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill px-5
-      min-h-tap font-semibold transition-colors active:scale-[0.98]
-      disabled:opacity-50 disabled:pointer-events-none select-none;
+    @apply inline-flex cursor-pointer select-none items-center justify-center gap-2
+      rounded-pill px-5 min-h-11 font-semibold tracking-[-0.01em]
+      transition-all duration-300 ease-brand active:scale-[0.98]
+      disabled:pointer-events-none disabled:opacity-50;
   }
+  /* primary: oil-gold with the signature oil glow */
   .btn-primary {
-    @apply btn bg-brand text-cream hover:bg-forest;
+    @apply btn bg-yellow text-ink shadow-oil
+      hover:-translate-y-px hover:bg-yellow-deep;
   }
+  /* gold alias = same primary oil treatment */
   .btn-gold {
-    @apply btn bg-gold text-charcoal hover:bg-gold-bright;
+    @apply btn bg-yellow text-ink shadow-oil
+      hover:-translate-y-px hover:bg-yellow-deep;
   }
   .btn-outline {
-    @apply btn border-2 border-brand text-brand bg-transparent hover:bg-brand/5;
+    @apply btn border border-ink/20 bg-paper text-ink
+      hover:border-ink/40 hover:bg-surface;
   }
   .btn-ghost {
-    @apply btn text-ink hover:bg-surface-2;
+    @apply btn bg-transparent text-ink hover:bg-surface;
   }
   .btn-danger {
-    @apply btn bg-danger text-cream hover:opacity-90;
+    @apply btn bg-danger text-paper hover:opacity-90;
   }
 
+  /* Form fields — chip radius, paper, gold-ink focus ring (§4). */
   .field-label {
-    @apply block text-sm font-semibold text-ink mb-1.5;
+    @apply mb-1.5 block text-sm font-medium text-ink;
   }
   .field-input {
-    @apply w-full rounded-card border border-line bg-white px-4 py-3
-      min-h-tap text-ink placeholder:text-muted
-      focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand;
+    @apply w-full rounded-chip border border-line bg-paper px-4 py-3
+      min-h-11 text-ink placeholder:text-ink-faint
+      transition-colors duration-200 ease-brand
+      focus:border-gold-ink focus:outline-none focus:ring-2 focus:ring-gold-ink/20;
   }
 
+  /* Status pill — chip/pill, semantic tint (§4). */
   .pill {
-    @apply inline-flex items-center gap-1 rounded-pill px-2.5 py-1 text-xs
-      font-semibold whitespace-nowrap;
+    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-pill
+      px-2.5 py-1 text-xs font-semibold;
+  }
+
+  /* Eyebrow / section label (§4) — uppercase gold-ink with leading tick. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase
+      tracking-[0.16em] text-gold-ink;
+  }
+  .eyebrow::before {
+    content: '';
+    @apply inline-block h-px w-[1.6rem] bg-gold-ink/60;
   }
 }
 
 @layer utilities {
+  /* Tabular/lining numerics for all money, quantities, dates, counts (§2). */
+  .tnum {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  /* Skeleton shimmer matching layout (§4) — no spinners on data surfaces. */
+  .skeleton {
+    @apply animate-pulse rounded-chip bg-surface;
+  }
   .pb-safe {
     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
   .h-screen-safe {
     height: 100dvh;
+  }
+  .min-h-screen-safe {
+    min-height: 100dvh;
   }
   .scroll-touch {
     -webkit-overflow-scrolling: touch;

@@ -46,10 +46,10 @@ export function GpsStatus({
 }) {
   const accuracyBad = reading && reading.accuracy > thresholdM;
   return (
-    <div className="rounded-card border border-line bg-white p-3">
+    <div className="rounded-card border border-line bg-paper p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <MapPinIcon className="h-5 w-5 text-brand" />
+          <MapPinIcon className="h-5 w-5 text-gold-ink" />
           <span className="font-semibold text-ink">Location</span>
         </div>
         <Button size="sm" variant="outline" onClick={onRead} loading={busy}>
@@ -63,14 +63,14 @@ export function GpsStatus({
       )}
       {reading && (
         <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-          <dt className="text-muted">Lat</dt>
-          <dd className="text-right tabular-nums">{reading.lat.toFixed(6)}</dd>
-          <dt className="text-muted">Lng</dt>
-          <dd className="text-right tabular-nums">{reading.lng.toFixed(6)}</dd>
-          <dt className="text-muted">Accuracy</dt>
+          <dt className="text-ink-faint">Lat</dt>
+          <dd className="text-right tnum text-ink-muted">{reading.lat.toFixed(6)}</dd>
+          <dt className="text-ink-faint">Lng</dt>
+          <dd className="text-right tnum text-ink-muted">{reading.lng.toFixed(6)}</dd>
+          <dt className="text-ink-faint">Accuracy</dt>
           <dd
             className={
-              'text-right tabular-nums ' +
+              'text-right tnum ' +
               (accuracyBad ? 'text-danger font-semibold' : 'text-success')
             }
           >
@@ -78,7 +78,7 @@ export function GpsStatus({
           </dd>
           {reading.is_mock && (
             <>
-              <dt className="text-muted">Mock</dt>
+              <dt className="text-ink-faint">Mock</dt>
               <dd className="text-right font-semibold text-danger">Detected</dd>
             </>
           )}

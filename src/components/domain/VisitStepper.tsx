@@ -12,10 +12,10 @@ export function VisitStepper({ current }: { current: VisitStep }) {
           <div className="flex flex-col items-center gap-1">
             <div
               className={cn(
-                'flex h-6 w-6 items-center justify-center rounded-pill text-xs font-bold',
-                i < idx && 'bg-success text-cream',
-                i === idx && 'bg-brand text-cream',
-                i > idx && 'bg-surface-2 text-muted',
+                'flex h-6 w-6 items-center justify-center rounded-pill text-xs font-bold tabular-nums',
+                i < idx && 'bg-success text-paper',
+                i === idx && 'bg-yellow text-ink',
+                i > idx && 'bg-surface text-ink-faint',
               )}
             >
               {i + 1}
@@ -23,7 +23,7 @@ export function VisitStepper({ current }: { current: VisitStep }) {
             <span
               className={cn(
                 'text-[10px] font-semibold',
-                i === idx ? 'text-brand' : 'text-muted',
+                i === idx ? 'text-gold-ink' : 'text-ink-faint',
               )}
             >
               {s}

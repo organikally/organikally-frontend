@@ -4,7 +4,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Pill } from '@/components/ui/Pill';
-import { Spinner, EmptyState } from '@/components/ui/Spinner';
+import { SkeletonList, EmptyState } from '@/components/ui/Spinner';
 import { VisitStepper } from '@/components/domain/VisitStepper';
 import { useVisitFlow } from '@/stores/visitFlow';
 import { useCatalog, computeCartTotals } from '@/features/catalog/data';
@@ -14,6 +14,7 @@ import {
   MinusIcon,
   SearchIcon,
   CartIcon,
+  PackageIcon,
 } from '@/components/ui/icons';
 import { cn } from '@/lib/cn';
 import type { CatalogItem } from '@/types/models';
@@ -69,7 +70,7 @@ export function VisitCatalog() {
 
       <div className="space-y-3 p-4 pt-0">
         <div className="relative">
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
+          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-faint" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -84,8 +85,8 @@ export function VisitCatalog() {
               key={c}
               onClick={() => setCat(c)}
               className={cn(
-                'pill tap !px-3',
-                cat === c ? 'bg-brand text-cream' : 'bg-surface-2 text-muted',
+                'pill tap !px-3 transition-colors duration-200 ease-brand',
+                cat === c ? 'bg-ink text-paper' : 'bg-surface text-ink-faint',
               )}
             >
               {c === 'all' ? 'All' : c}
@@ -94,9 +95,7 @@ export function VisitCatalog() {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-10">
-            <Spinner />
-          </div>
+          <SkeletonList rows={5} />
         ) : filtered.length === 0 ? (
           <EmptyState title="No products" />
         ) : (
@@ -116,11 +115,11 @@ export function VisitCatalog() {
       {/* Cart bar */}
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-xl border-t border-line bg-surface/98 p-3 backdrop-blur pb-safe">
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="flex items-center gap-1.5 text-muted">
+          <span className="flex items-center gap-1.5 tnum text-ink-muted">
             <CartIcon className="h-4 w-4" />
             {totals.skuCount} items · {totals.units} units
           </span>
-          <span className="font-semibold text-ink">{inr(totals.total)}</span>
+          <span className="font-semibold tnum text-ink">{inr(totals.total)}</span>
         </div>
         <Button
           variant="primary"
@@ -152,17 +151,17 @@ function CatalogRow({
   return (
     <Card className={cn('!p-3', out && 'opacity-70')}>
       <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-surface-2 text-lg">
-          <span aria-hidden>🫙</span>
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-chip bg-surface text-ink-faint">
+          <PackageIcon className="h-6 w-6" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="truncate font-semibold text-ink">{sku.name}</h3>
-          <p className="text-xs text-muted">
+          <h3 className="truncate font-sans font-semibold text-ink">{sku.name}</h3>
+          <p className="text-xs tnum text-ink-faint">
             {sku.pack_size} · MOQ {sku.moq || 1} · GST {sku.gst_rate}%
           </p>
           <div className="mt-1 flex items-center gap-2">
-            <span className="font-semibold text-brand">{inr(sku.ptr)}</span>
-            <span className="text-xs text-muted line-through">
+            <span className="font-semibold tnum text-gold-ink">{inr(sku.ptr)}</span>
+            <span className="text-xs tnum text-ink-faint line-through">
               MRP {inr(sku.mrp)}
             </span>
             {out ? (
@@ -193,7 +192,6 @@ function CatalogRow({
               variant="outline"
               leftIcon={<PlusIcon className="h-4 w-4" />}
               onClick={() => onQty(step)}
-              className="!border-brand"
             >
               Add
             </Button>
@@ -219,7 +217,7 @@ function Stepper({
     <div className="flex items-center gap-2">
       <button
         onClick={() => onChange(Math.max(0, value - step))}
-        className="tap flex h-10 w-10 items-center justify-center rounded-pill border-2 border-line text-ink active:bg-surface-2"
+        className="tap flex h-10 w-10 items-center justify-center rounded-pill border border-line text-ink transition-colors duration-200 ease-brand active:bg-surface"
         aria-label="Decrease"
       >
         <MinusIcon className="h-5 w-5" />
@@ -231,12 +229,12 @@ function Stepper({
           onChange(n);
         }}
         inputMode="numeric"
-        className="w-14 rounded-card border border-line py-2 text-center font-semibold text-ink"
+        className="w-14 rounded-chip border border-line bg-paper py-2 text-center font-semibold tnum text-ink focus:border-gold-ink focus:outline-none focus:ring-2 focus:ring-gold-ink/20"
       />
       <button
         onClick={() => onChange(Math.min(max, value + step))}
         disabled={value >= max}
-        className="tap flex h-10 w-10 items-center justify-center rounded-pill border-2 border-brand text-brand active:bg-brand/5 disabled:opacity-40"
+        className="tap flex h-10 w-10 items-center justify-center rounded-pill border border-gold-ink text-gold-ink transition-colors duration-200 ease-brand active:bg-yellow/10 disabled:opacity-40"
         aria-label="Increase"
       >
         <PlusIcon className="h-5 w-5" />

@@ -14,7 +14,8 @@ export function Card({ className, children, onPress, ...rest }: CardProps) {
         type="button"
         onClick={onPress}
         className={cn(
-          'card w-full text-left p-4 active:bg-surface-2 transition-colors',
+          'card w-full cursor-pointer p-4 text-left transition-colors duration-200 ease-brand',
+          'hover:border-line active:scale-[0.99] active:bg-surface',
           className,
         )}
       >

@@ -32,7 +32,7 @@ function Wrap({
       {error ? (
         <span className="mt-1 block text-sm text-danger">{error}</span>
       ) : hint ? (
-        <span className="mt-1 block text-sm text-muted">{hint}</span>
+        <span className="mt-1 block text-sm text-ink-faint">{hint}</span>
       ) : null}
     </label>
   );
@@ -49,7 +49,11 @@ export function Input({
   return (
     <Wrap label={label} hint={hint} error={error} required={required}>
       <input
-        className={cn('field-input', error && 'border-danger', className)}
+        className={cn(
+          'field-input',
+          error && 'border-danger focus:border-danger focus:ring-danger/20',
+          className,
+        )}
         {...rest}
       />
     </Wrap>
@@ -67,7 +71,11 @@ export function Textarea({
   return (
     <Wrap label={label} hint={hint} error={error} required={required}>
       <textarea
-        className={cn('field-input min-h-[88px]', error && 'border-danger', className)}
+        className={cn(
+          'field-input min-h-[88px] leading-relaxed',
+          error && 'border-danger focus:border-danger focus:ring-danger/20',
+          className,
+        )}
         {...rest}
       />
     </Wrap>
@@ -85,12 +93,30 @@ export function Select({
 }: FieldProps & SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <Wrap label={label} hint={hint} error={error} required={required}>
-      <select
-        className={cn('field-input appearance-none', error && 'border-danger', className)}
-        {...rest}
-      >
-        {children}
-      </select>
+      <div className="relative">
+        <select
+          className={cn(
+            'field-input appearance-none pr-10',
+            error && 'border-danger focus:border-danger focus:ring-danger/20',
+            className,
+          )}
+          {...rest}
+        >
+          {children}
+        </select>
+        <svg
+          className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </div>
     </Wrap>
   );
 }

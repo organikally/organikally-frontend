@@ -13,11 +13,11 @@ type Tone = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'brand';
 
 const toneClass: Record<Tone, string> = {
   success: 'bg-success/12 text-success',
-  warning: 'bg-warning/15 text-[#8a6d12]',
+  warning: 'bg-warning/12 text-warning',
   danger: 'bg-danger/12 text-danger',
   info: 'bg-info/12 text-info',
-  neutral: 'bg-surface-2 text-muted',
-  brand: 'bg-brand/12 text-brand',
+  neutral: 'bg-surface text-ink-faint',
+  brand: 'bg-yellow/20 text-gold-ink',
 };
 
 export function Pill({
@@ -48,8 +48,8 @@ export function OutletStatusPill({ status }: { status: OutletStatus }) {
 const orderTone: Record<OrderStatus, Tone> = {
   draft: 'neutral',
   submitted: 'info',
-  approved: 'brand',
-  allocated: 'brand',
+  approved: 'warning',
+  allocated: 'info',
   dispatched: 'info',
   delivered: 'success',
   invoiced: 'success',

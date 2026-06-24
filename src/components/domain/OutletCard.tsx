@@ -20,16 +20,16 @@ export function OutletCard({
     <Card onPress={onPress} className="!p-3.5">
       <div className="flex items-start gap-3">
         {typeof index === 'number' && (
-          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-pill bg-brand/10 text-sm font-bold text-brand">
+          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-pill bg-yellow/20 text-sm font-bold tabular-nums text-gold-ink">
             {index + 1}
           </span>
         )}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="truncate font-semibold text-ink">{outlet.name}</h3>
+            <h3 className="truncate font-sans font-semibold text-ink">{outlet.name}</h3>
           </div>
-          <p className="truncate text-xs text-muted">
-            {outlet.code} · {outlet.profile?.owner_name || 'Owner —'}
+          <p className="truncate text-xs text-ink-faint">
+            {outlet.code} · {outlet.profile?.owner_name || 'Owner'}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <OutletStatusPill status={outlet.status} />
@@ -45,7 +45,7 @@ export function OutletCard({
             )}
           </div>
           {(outlet.last_visit_at || outlet.next_visit_date) && (
-            <p className="mt-2 flex items-center gap-1 text-xs text-muted">
+            <p className="mt-2 flex items-center gap-1 text-xs text-ink-faint">
               <ClockIcon className="h-3.5 w-3.5" />
               {outlet.last_visit_at
                 ? `Last visit ${relativeTime(outlet.last_visit_at)}`
@@ -53,7 +53,7 @@ export function OutletCard({
             </p>
           )}
         </div>
-        <ChevronRightIcon className="mt-1 h-5 w-5 shrink-0 text-line" />
+        <ChevronRightIcon className="mt-1 h-5 w-5 shrink-0 text-ink-faint/50" />
       </div>
     </Card>
   );

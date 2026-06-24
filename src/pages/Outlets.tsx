@@ -4,7 +4,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { Button } from '@/components/ui/Button';
 import { OutletCard } from '@/components/domain/OutletCard';
 import { MiniMap } from '@/components/domain/MiniMap';
-import { EmptyState, Spinner } from '@/components/ui/Spinner';
+import { EmptyState, SkeletonList, ErrorState } from '@/components/ui/Spinner';
 import { useOutlets } from '@/features/outlet/data';
 import { useGpsReader } from '@/components/domain/GpsReader';
 import { haversineMeters, pointToLatLng } from '@/lib/geo/geo';
@@ -27,7 +27,7 @@ const STATUS_FILTERS: { value: OutletStatus | 'all'; label: string }[] = [
 
 export function Outlets() {
   const nav = useNavigate();
-  const { data, isLoading } = useOutlets();
+  const { data, isLoading, isError, refetch } = useOutlets();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState<OutletStatus | 'all'>('all');
   const [view, setView] = useState<'list' | 'map'>('list');
@@ -69,7 +69,7 @@ export function Outlets() {
         right={
           <button
             onClick={() => setView((v) => (v === 'list' ? 'map' : 'list'))}
-            className="tap flex items-center justify-center rounded-pill text-brand active:bg-surface-2"
+            className="tap flex items-center justify-center rounded-pill text-gold-ink transition-colors duration-200 ease-brand active:bg-surface"
             aria-label="Toggle map"
           >
             {view === 'list' ? (
@@ -83,7 +83,7 @@ export function Outlets() {
 
       <div className="space-y-3 p-4">
         <div className="relative">
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
+          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-faint" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -98,10 +98,10 @@ export function Outlets() {
               key={f.value}
               onClick={() => setStatus(f.value)}
               className={
-                'pill tap !px-3 ' +
+                'pill tap !px-3 transition-colors duration-200 ease-brand ' +
                 (status === f.value
-                  ? 'bg-brand text-cream'
-                  : 'bg-surface-2 text-muted')
+                  ? 'bg-ink text-paper'
+                  : 'bg-surface text-ink-faint')
               }
             >
               {f.label}
@@ -125,9 +125,12 @@ export function Outlets() {
         )}
 
         {isLoading ? (
-          <div className="flex justify-center py-10">
-            <Spinner />
-          </div>
+          <SkeletonList rows={5} />
+        ) : isError ? (
+          <ErrorState
+            body="Could not load outlets."
+            onRetry={() => void refetch()}
+          />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={<MapPinIcon className="h-10 w-10" />}
@@ -160,14 +163,14 @@ export function Outlets() {
 
       <button
         onClick={() => nav('/outlets/onboard')}
-        className="fixed bottom-[calc(var(--nav,64px)+16px+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-pill bg-gold text-charcoal shadow-card-lg active:scale-95"
+        className="fixed bottom-[calc(var(--nav,64px)+16px+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-pill bg-yellow text-ink shadow-oil transition-transform duration-200 ease-brand active:scale-95"
         aria-label="Onboard outlet"
       >
         <PlusIcon className="h-7 w-7" />
       </button>
 
       {me && (
-        <Pill tone="info" className="fixed left-4 top-16 z-30 shadow-card">
+        <Pill tone="info" className="fixed left-4 top-16 z-30 shadow-sm">
           Sorted by distance
         </Pill>
       )}

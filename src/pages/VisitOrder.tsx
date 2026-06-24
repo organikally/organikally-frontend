@@ -109,8 +109,8 @@ export function VisitOrder() {
             return (
               <Card key={sku.id} className="!p-3">
                 <TrashRow onDelete={() => setQty(sku, 0)}>
-                  <h3 className="font-semibold text-ink">{sku.name}</h3>
-                  <p className="text-xs text-muted">
+                  <h3 className="font-sans font-semibold text-ink">{sku.name}</h3>
+                  <p className="text-xs tnum text-ink-faint">
                     {line.qty} × {inr(sku.ptr)} = {inr(gross)}
                   </p>
                 </TrashRow>
@@ -135,10 +135,10 @@ export function VisitOrder() {
                   />
                 </div>
                 <div className="mt-2 flex items-center justify-between border-t border-line pt-2 text-sm">
-                  <span className="text-muted">
+                  <span className="tnum text-ink-faint">
                     +GST {sku.gst_rate}% ({inr(gst)})
                   </span>
-                  <span className="font-semibold text-ink">
+                  <span className="font-semibold tnum text-ink">
                     {inr(net + gst)}
                   </span>
                 </div>
@@ -196,10 +196,14 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between py-0.5 text-sm">
-      <span className={bold ? 'font-semibold text-ink' : 'text-muted'}>
+      <span className={bold ? 'font-semibold text-ink' : 'text-ink-faint'}>
         {label}
       </span>
-      <span className={bold ? 'text-lg font-bold text-ink' : 'text-ink'}>
+      <span
+        className={
+          'tnum ' + (bold ? 'text-lg font-bold text-ink' : 'text-ink')
+        }
+      >
         {value}
       </span>
     </div>

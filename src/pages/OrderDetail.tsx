@@ -2,15 +2,25 @@ import { useParams } from 'react-router-dom';
 import { TopBar } from '@/components/layout/TopBar';
 import { Card } from '@/components/ui/Card';
 import { OrderStatusPill, Pill } from '@/components/ui/Pill';
-import { FullScreenLoader, EmptyState } from '@/components/ui/Spinner';
+import { FullScreenLoader, EmptyState, ErrorState } from '@/components/ui/Spinner';
 import { useOrder } from '@/features/order/data';
 import { inr, fmtDate, fmtDateTime } from '@/lib/format';
 
 export function OrderDetail() {
   const { id } = useParams();
-  const { data: order, isLoading } = useOrder(id);
+  const { data: order, isLoading, isError, refetch } = useOrder(id);
 
   if (isLoading) return <FullScreenLoader label="Loading order" />;
+  if (isError)
+    return (
+      <div>
+        <TopBar title="Order" back />
+        <ErrorState
+          body="Could not load this order."
+          onRetry={() => void refetch()}
+        />
+      </div>
+    );
   if (!order)
     return (
       <div>
@@ -30,11 +40,11 @@ export function OrderDetail() {
             <OrderStatusPill status={order.status} />
             {isLocal && <Pill tone="warning">Not yet synced</Pill>}
           </div>
-          <p className="mt-2 text-sm text-muted">
+          <p className="mt-2 text-sm text-ink-muted">
             Created {fmtDateTime(order.created_at)}
           </p>
           {order.expected_delivery_date && (
-            <p className="text-sm text-muted">
+            <p className="text-sm text-ink-muted">
               Expected delivery {fmtDate(order.expected_delivery_date)}
             </p>
           )}
@@ -45,46 +55,48 @@ export function OrderDetail() {
             className={
               order.credit_check.result === 'ok'
                 ? 'border-success/40'
-                : 'border-warning/50'
+                : 'border-warning/40'
             }
           >
-            <h3 className="mb-1 font-semibold text-ink">Credit check</h3>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-              <span className="text-muted">Limit</span>
-              <span className="text-right">{inr(order.credit_check.limit)}</span>
-              <span className="text-muted">Outstanding</span>
-              <span className="text-right">
+            <h2 className="mb-2 font-display text-lg text-ink">Credit check</h2>
+            <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
+              <dt className="text-ink-faint">Limit</dt>
+              <dd className="text-right tnum text-ink">
+                {inr(order.credit_check.limit)}
+              </dd>
+              <dt className="text-ink-faint">Outstanding</dt>
+              <dd className="text-right tnum text-ink">
                 {inr(order.credit_check.outstanding)}
-              </span>
-              <span className="text-muted">Result</span>
-              <span className="text-right font-semibold capitalize">
+              </dd>
+              <dt className="text-ink-faint">Result</dt>
+              <dd className="text-right font-semibold capitalize text-ink">
                 {order.credit_check.result.replace('_', ' ')}
-              </span>
-            </div>
+              </dd>
+            </dl>
           </Card>
         )}
 
-        <Card>
-          <h3 className="mb-2 font-semibold text-ink">Items</h3>
-          <div className="space-y-2">
+        <Card className="!p-0">
+          <h2 className="px-4 pt-4 font-display text-lg text-ink">Items</h2>
+          <ul className="mt-2 divide-y divide-line">
             {order.line_items.map((li, i) => (
-              <div
+              <li
                 key={`${li.sku_id}-${i}`}
-                className="flex items-center justify-between border-b border-line pb-2 last:border-0 last:pb-0"
+                className="flex items-center justify-between gap-3 px-4 py-3"
               >
                 <div className="min-w-0">
                   <p className="truncate font-medium text-ink">{li.sku_name}</p>
-                  <p className="text-xs text-muted">
+                  <p className="text-xs tnum text-ink-faint">
                     {li.qty} × {inr(li.unit_price)}
                     {li.discount_pct > 0 && ` · -${li.discount_pct}%`}
                   </p>
                 </div>
-                <span className="font-semibold text-ink">
+                <span className="shrink-0 font-semibold tnum text-ink">
                   {inr(li.line_total)}
                 </span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </Card>
 
         <Card>
@@ -97,13 +109,16 @@ export function OrderDetail() {
         </Card>
 
         {order.status_history.length > 0 && (
-          <Card>
-            <h3 className="mb-2 font-semibold text-ink">History</h3>
-            <ol className="space-y-2">
+          <Card className="!p-0">
+            <h2 className="px-4 pt-4 font-display text-lg text-ink">History</h2>
+            <ol className="mt-2 divide-y divide-line">
               {order.status_history.map((h, i) => (
-                <li key={i} className="flex items-center justify-between text-sm">
+                <li
+                  key={i}
+                  className="flex items-center justify-between px-4 py-3 text-sm"
+                >
                   <OrderStatusPill status={h.status} />
-                  <span className="text-muted">{fmtDateTime(h.at)}</span>
+                  <span className="tnum text-ink-faint">{fmtDateTime(h.at)}</span>
                 </li>
               ))}
             </ol>
@@ -125,10 +140,14 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between py-0.5 text-sm">
-      <span className={bold ? 'font-semibold text-ink' : 'text-muted'}>
+      <span className={bold ? 'font-semibold text-ink' : 'text-ink-faint'}>
         {label}
       </span>
-      <span className={bold ? 'text-lg font-bold text-ink' : 'text-ink'}>
+      <span
+        className={
+          'tnum ' + (bold ? 'text-lg font-bold text-ink' : 'text-ink')
+        }
+      >
         {value}
       </span>
     </div>

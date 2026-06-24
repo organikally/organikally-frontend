@@ -117,10 +117,12 @@ export function VisitPayment() {
       </div>
 
       <div className="space-y-3 p-4 pt-0">
-        <Card className="bg-forest text-cream">
+        <Card className="border-ink bg-ink text-paper">
           <div className="flex items-center justify-between">
-            <span className="text-cream/80">Order total</span>
-            <span className="text-2xl font-bold">{inr(orderTotal)}</span>
+            <span className="text-paper/80">Order total</span>
+            <span className="text-2xl font-bold tnum text-yellow">
+              {inr(orderTotal)}
+            </span>
           </div>
         </Card>
 
@@ -132,10 +134,10 @@ export function VisitPayment() {
                 key={t}
                 onClick={() => setType(t)}
                 className={cn(
-                  'tap rounded-card border-2 px-2 py-2.5 text-sm font-semibold',
+                  'tap rounded-chip border px-2 py-2.5 text-sm font-semibold transition-colors duration-200 ease-brand',
                   type === t
-                    ? 'border-brand bg-brand/5 text-brand'
-                    : 'border-line text-muted',
+                    ? 'border-gold-ink bg-yellow/10 text-gold-ink'
+                    : 'border-line text-ink-faint',
                 )}
               >
                 {PAYMENT_TYPE_LABELS[t]}
@@ -220,8 +222,8 @@ export function VisitPayment() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-0.5 text-sm">
-      <span className="text-muted">{label}</span>
-      <span className="font-semibold text-ink">{value}</span>
+      <span className="text-ink-faint">{label}</span>
+      <span className="font-semibold tnum text-ink">{value}</span>
     </div>
   );
 }

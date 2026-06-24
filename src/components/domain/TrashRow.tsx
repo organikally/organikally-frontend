@@ -12,7 +12,7 @@ export function TrashRow({
       <div className="min-w-0 flex-1">{children}</div>
       <button
         onClick={onDelete}
-        className="tap -mr-1 flex items-center justify-center rounded-pill text-muted active:bg-surface-2"
+        className="tap -mr-1 flex items-center justify-center rounded-pill text-ink-faint transition-colors duration-200 ease-brand active:bg-surface"
         aria-label="Remove"
       >
         <svg
@@ -21,7 +21,7 @@ export function TrashRow({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >

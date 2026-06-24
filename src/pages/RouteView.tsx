@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components/layout/TopBar';
 import { MiniMap, geoLink } from '@/components/domain/MiniMap';
 import { OutletCard } from '@/components/domain/OutletCard';
-import { EmptyState, Spinner } from '@/components/ui/Spinner';
+import { EmptyState, SkeletonList, ErrorState } from '@/components/ui/Spinner';
 import { useTodayRoute } from '@/features/route/data';
 import { useGpsReader } from '@/components/domain/GpsReader';
 import { pointToLatLng } from '@/lib/geo/geo';
-import { RouteIcon } from '@/components/ui/icons';
+import { RouteIcon, ChevronRightIcon } from '@/components/ui/icons';
 
 export function RouteView() {
   const nav = useNavigate();
-  const { data, isLoading } = useTodayRoute();
+  const { data, isLoading, isError, refetch } = useTodayRoute();
   const { reading, read } = useGpsReader();
   const outlets = data?.outlets ?? [];
   const me = reading ? { lat: reading.lat, lng: reading.lng } : null;
@@ -25,9 +25,12 @@ export function RouteView() {
       <TopBar title="Today's route" subtitle={`${outlets.length} stops`} />
       <div className="space-y-4 p-4">
         {isLoading ? (
-          <div className="flex justify-center py-10">
-            <Spinner />
-          </div>
+          <SkeletonList rows={4} />
+        ) : isError ? (
+          <ErrorState
+            body="Could not load today's route."
+            onRetry={() => void refetch()}
+          />
         ) : outlets.length === 0 ? (
           <EmptyState
             icon={<RouteIcon className="h-10 w-10" />}
@@ -54,9 +57,10 @@ export function RouteView() {
                     />
                     <a
                       href={geoLink(lat, lng, o.name)}
-                      className="ml-10 inline-block text-sm font-semibold text-info"
+                      className="ml-10 inline-flex items-center gap-0.5 text-sm font-semibold text-info"
                     >
-                      Navigate →
+                      Navigate
+                      <ChevronRightIcon className="h-4 w-4" />
                     </a>
                   </div>
                 );

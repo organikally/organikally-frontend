@@ -20,9 +20,9 @@ export function inrCompact(amount: number | null | undefined): string {
 }
 
 export function fmtDate(iso?: string | null): string {
-  if (!iso) return '—';
+  if (!iso) return '-';
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) return '-';
   return d.toLocaleDateString('en-IN', {
     day: '2-digit',
     month: 'short',
@@ -31,9 +31,9 @@ export function fmtDate(iso?: string | null): string {
 }
 
 export function fmtTime(iso?: string | null): string {
-  if (!iso) return '—';
+  if (!iso) return '-';
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) return '-';
   return d.toLocaleTimeString('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
@@ -41,14 +41,14 @@ export function fmtTime(iso?: string | null): string {
 }
 
 export function fmtDateTime(iso?: string | null): string {
-  if (!iso) return '—';
+  if (!iso) return '-';
   return `${fmtDate(iso)}, ${fmtTime(iso)}`;
 }
 
 export function relativeTime(iso?: string | null): string {
-  if (!iso) return '—';
+  if (!iso) return '-';
   const d = new Date(iso).getTime();
-  if (Number.isNaN(d)) return '—';
+  if (Number.isNaN(d)) return '-';
   const diff = Date.now() - d;
   const min = Math.round(diff / 60000);
   if (Math.abs(min) < 1) return 'just now';

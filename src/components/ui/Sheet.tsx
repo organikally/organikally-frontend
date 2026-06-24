@@ -33,13 +33,13 @@ export function Sheet({
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
       <button
         aria-label="Close"
-        className="absolute inset-0 bg-charcoal/40 backdrop-blur-[1px]"
+        className="absolute inset-0 bg-ink/40 backdrop-blur-[1px] animate-[sheetFade_.2s_cubic-bezier(.16,1,.3,1)]"
         onClick={onClose}
       />
       <div
         className={cn(
-          'relative z-10 w-full rounded-t-[20px] bg-surface shadow-sheet',
-          'flex flex-col animate-[slideUp_.18s_ease-out]',
+          'relative z-10 flex w-full flex-col rounded-t-card bg-paper shadow-sheet',
+          'animate-[sheetUp_.3s_cubic-bezier(.16,1,.3,1)]',
           size === 'tall' && 'max-h-[88dvh]',
           size === 'full' && 'h-[96dvh]',
           size === 'auto' && 'max-h-[88dvh]',
@@ -47,7 +47,7 @@ export function Sheet({
       >
         <div className="mx-auto mt-2.5 h-1 w-10 shrink-0 rounded-pill bg-line" />
         {title && (
-          <h2 className="px-5 pt-3 pb-2 text-lg font-semibold text-ink">
+          <h2 className="px-5 pb-2 pt-3 font-display text-xl text-ink">
             {title}
           </h2>
         )}
@@ -55,12 +55,12 @@ export function Sheet({
           {children}
         </div>
         {footer && (
-          <div className="border-t border-line bg-surface px-5 pt-3 pb-safe">
+          <div className="border-t border-line bg-paper px-5 pb-safe pt-3">
             {footer}
           </div>
         )}
       </div>
-      <style>{`@keyframes slideUp{from{transform:translateY(12%);opacity:.6}to{transform:translateY(0);opacity:1}}`}</style>
+      <style>{`@keyframes sheetUp{from{transform:translateY(16px);opacity:.7}to{transform:translateY(0);opacity:1}}@keyframes sheetFade{from{opacity:0}to{opacity:1}}`}</style>
     </div>
   );
 }

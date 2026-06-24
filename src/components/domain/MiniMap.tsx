@@ -72,9 +72,9 @@ export function MiniMap({
       className="relative w-full overflow-hidden rounded-card border border-line"
       style={{
         height,
-        backgroundColor: '#EEF1E8',
+        backgroundColor: '#F4F1E9',
         backgroundImage:
-          'linear-gradient(#E0E4D6 1px, transparent 1px), linear-gradient(90deg, #E0E4D6 1px, transparent 1px)',
+          'linear-gradient(#E6E0D3 1px, transparent 1px), linear-gradient(90deg, #E6E0D3 1px, transparent 1px)',
         backgroundSize: '28px 28px',
       }}
       role="img"
@@ -82,9 +82,9 @@ export function MiniMap({
     >
       {/* subtle "roads" */}
       <div className="pointer-events-none absolute inset-0 opacity-50">
-        <div className="absolute left-0 right-0 top-1/3 h-[3px] bg-[#D6DBC8]" />
-        <div className="absolute bottom-1/4 left-0 right-0 h-[3px] bg-[#D6DBC8]" />
-        <div className="absolute bottom-0 left-2/3 top-0 w-[3px] bg-[#D6DBC8]" />
+        <div className="absolute left-0 right-0 top-1/3 h-[3px] bg-[#DDD6C6]" />
+        <div className="absolute bottom-1/4 left-0 right-0 h-[3px] bg-[#DDD6C6]" />
+        <div className="absolute bottom-0 left-2/3 top-0 w-[3px] bg-[#DDD6C6]" />
       </div>
 
       {me && bounds && <Marker {...project(me.lat, me.lng)} label="You" />}
@@ -101,18 +101,20 @@ export function MiniMap({
           >
             <span
               className={
-                'flex h-7 w-7 items-center justify-center rounded-pill border-2 border-white shadow-card ' +
-                (o.id === selectedId ? 'bg-gold' : 'bg-brand')
+                'flex h-7 w-7 items-center justify-center rounded-pill border-2 shadow-sm ' +
+                (o.id === selectedId
+                  ? 'border-ink bg-yellow ring-2 ring-ink'
+                  : 'border-paper bg-yellow')
               }
             >
-              <MapPinIcon className="h-4 w-4 text-cream" />
+              <MapPinIcon className="h-4 w-4 text-ink" />
             </span>
           </button>
         );
       })}
 
       {!points.length && (
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-muted">
+        <div className="absolute inset-0 flex items-center justify-center text-sm text-ink-faint">
           No located outlets
         </div>
       )}
@@ -137,7 +139,7 @@ function Marker({
     >
       <span className="relative flex h-4 w-4">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-pill bg-info/50" />
-        <span className="relative inline-flex h-4 w-4 rounded-pill border-2 border-white bg-info" />
+        <span className="relative inline-flex h-4 w-4 rounded-pill border-2 border-paper bg-info" />
       </span>
     </div>
   );

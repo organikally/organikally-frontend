@@ -57,7 +57,7 @@ export function CameraCapture({ value, onCapture, label = 'Live photo' }: Props)
           <button
             type="button"
             onClick={capture}
-            className="btn-ghost absolute bottom-2 right-2 !min-h-[40px] bg-surface/90 px-3 text-sm shadow-card"
+            className="btn-ghost absolute bottom-2 right-2 !min-h-[40px] bg-surface/90 px-3 text-sm shadow-sm"
           >
             <CameraIcon className="h-4 w-4" /> Retake
           </button>
@@ -67,17 +67,17 @@ export function CameraCapture({ value, onCapture, label = 'Live photo' }: Props)
           type="button"
           onClick={capture}
           disabled={busy}
-          className="flex h-48 w-full flex-col items-center justify-center gap-2 rounded-card border-2 border-dashed border-line bg-surface-2 text-muted active:bg-line/40"
+          className="flex h-48 w-full flex-col items-center justify-center gap-2 rounded-card border-2 border-dashed border-line bg-surface text-ink-faint transition-colors duration-200 ease-brand active:bg-line/40"
         >
           {busy ? (
             <Spinner />
           ) : (
             <>
-              <CameraIcon className="h-9 w-9 text-brand" />
+              <CameraIcon className="h-9 w-9 text-gold-ink" />
               <span className="text-sm font-semibold text-ink">
                 Take live photo
               </span>
-              <span className="text-xs">Camera only — no gallery</span>
+              <span className="text-xs">Camera only, no gallery</span>
             </>
           )}
         </button>

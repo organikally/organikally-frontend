@@ -147,7 +147,7 @@ export function CheckIn() {
             )}
             {evalResult.clean && (
               <p className="mt-1 flex items-center gap-1.5 text-sm text-success">
-                <CheckIcon className="h-4 w-4" /> Verified — you're at the shop.
+                <CheckIcon className="h-4 w-4" /> Verified. You're at the shop.
               </p>
             )}
           </Card>
@@ -171,7 +171,7 @@ export function CheckIn() {
               onChange={(e) => setFlagReason(e.target.value)}
               placeholder="e.g. shop moved, parked across road, GPS drift"
             />
-            <p className="mt-1 text-xs text-muted">
+            <p className="mt-1 text-xs text-ink-faint">
               This check-in will be recorded and surfaced to your ASM.
             </p>
           </Card>

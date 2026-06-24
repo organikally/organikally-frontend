@@ -12,7 +12,7 @@ export function SyncIndicator({ className }: { className?: string }) {
   let label = 'Synced';
 
   if (!online) {
-    tone = 'bg-surface-2 text-muted';
+    tone = 'bg-surface text-ink-faint';
     Icon = WifiOffIcon;
     label = pending > 0 ? `Offline · ${pending} queued` : 'Offline';
   } else if (errors > 0) {
@@ -24,7 +24,7 @@ export function SyncIndicator({ className }: { className?: string }) {
     Icon = SyncIcon;
     label = 'Syncing…';
   } else if (pending > 0) {
-    tone = 'bg-warning/15 text-[#8a6d12]';
+    tone = 'bg-warning/12 text-warning';
     Icon = SyncIcon;
     label = `${pending} queued`;
   }

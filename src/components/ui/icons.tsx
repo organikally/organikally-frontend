@@ -1,4 +1,5 @@
-// Lean inline SVG icon set (no icon library — keep bundle small).
+// Lean inline SVG icon set (Lucide-style geometry, 1.5px stroke — DESIGN_SYSTEM §4,
+// kept in-repo to avoid a runtime icon dependency and stay offline-safe).
 import type { SVGProps } from 'react';
 
 type P = SVGProps<SVGSVGElement>;
@@ -8,7 +9,7 @@ const base = (props: P) => ({
   viewBox: '0 0 24 24',
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 2,
+  strokeWidth: 1.5,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
   ...props,
@@ -126,5 +127,11 @@ export const RupeeIcon = (p: P) => (
 export const ListIcon = (p: P) => (
   <svg {...base(p)}>
     <path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />
+  </svg>
+);
+export const XCircleIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m15 9-6 6M9 9l6 6" />
   </svg>
 );

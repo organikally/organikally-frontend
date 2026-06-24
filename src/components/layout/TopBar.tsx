@@ -18,23 +18,23 @@ export function TopBar({
 }) {
   const nav = useNavigate();
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur">
       <div className="flex items-center gap-2 px-3 py-2.5">
         {back && (
           <button
             onClick={() => nav(-1)}
-            className="tap -ml-1 flex items-center justify-center rounded-pill text-ink active:bg-surface-2"
+            className="tap -ml-1 flex items-center justify-center rounded-pill text-ink transition-colors duration-200 ease-brand active:bg-surface"
             aria-label="Back"
           >
             <ChevronLeftIcon />
           </button>
         )}
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-lg font-semibold leading-tight text-ink">
+          <h1 className="truncate font-display text-xl leading-tight text-ink">
             {title}
           </h1>
           {subtitle && (
-            <p className="truncate text-xs text-muted">{subtitle}</p>
+            <p className="truncate text-xs text-ink-faint">{subtitle}</p>
           )}
         </div>
         {right}

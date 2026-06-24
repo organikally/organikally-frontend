@@ -85,7 +85,7 @@ export function SyncStatus() {
             <div
               className={
                 'flex h-11 w-11 items-center justify-center rounded-pill ' +
-                (state.online ? 'bg-success/12 text-success' : 'bg-surface-2 text-muted')
+                (state.online ? 'bg-success/12 text-success' : 'bg-surface text-ink-faint')
               }
             >
               {!state.online ? (
@@ -110,7 +110,7 @@ export function SyncStatus() {
                         ? `${state.pending} queued`
                         : 'All synced'}
               </p>
-              <p className="text-xs text-muted">
+              <p className="text-xs text-ink-faint">
                 {state.lastSyncAt
                   ? `Last sync ${relativeTime(state.lastSyncAt)}`
                   : 'Not synced yet'}
@@ -147,24 +147,24 @@ export function SyncStatus() {
         {photos.length > 0 && (
           <Card>
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="flex items-center gap-1.5 font-semibold text-ink">
-                <CameraIcon className="h-5 w-5 text-brand" /> Photos
+              <h3 className="flex items-center gap-1.5 font-sans font-semibold text-ink">
+                <CameraIcon className="h-5 w-5 text-gold-ink" /> Photos
               </h3>
-              <span className="text-sm text-muted">
+              <span className="text-sm tnum text-ink-faint">
                 {pendingPhotos.length} pending · {photos.length} total
               </span>
             </div>
-            <p className="text-xs text-muted">
+            <p className="text-xs text-ink-faint">
               Live photos upload opportunistically; their mutation is held until
               the photo URL is ready.
             </p>
           </Card>
         )}
 
-        {/* Outbound queue */}
+        {/* Outbound queue: hairline-grouped, no card-in-card (§4) */}
         <section>
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-ink">Outbound queue</h2>
+            <h2 className="font-display text-lg text-ink">Outbound queue</h2>
             <Button
               variant="ghost"
               size="sm"
@@ -182,34 +182,38 @@ export function SyncStatus() {
               body="All your visits and orders have synced."
             />
           ) : (
-            <div className="space-y-2">
-              {muts.map((m) => (
-                <Card key={m.client_uuid} className="!p-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="font-medium text-ink">
-                        {m.label || TYPE_LABELS[m.type] || m.type}
-                      </p>
-                      <p className="text-xs text-muted">
-                        {fmtDateTime(m.created_at)}
-                        {m.attempts > 0 && ` · ${m.attempts} attempt(s)`}
-                      </p>
-                      {m.last_error && (
-                        <p className="mt-1 text-xs text-danger">{m.last_error}</p>
-                      )}
+            <Card className="!p-0">
+              <ul className="divide-y divide-line">
+                {muts.map((m) => (
+                  <li key={m.client_uuid} className="p-3.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-ink">
+                          {m.label || TYPE_LABELS[m.type] || m.type}
+                        </p>
+                        <p className="text-xs tnum text-ink-faint">
+                          {fmtDateTime(m.created_at)}
+                          {m.attempts > 0 && ` · ${m.attempts} attempt(s)`}
+                        </p>
+                        {m.last_error && (
+                          <p className="mt-1 text-xs text-danger">
+                            {m.last_error}
+                          </p>
+                        )}
+                      </div>
+                      <QueuePill status={m.status} />
                     </div>
-                    <QueuePill status={m.status} />
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  </li>
+                ))}
+              </ul>
+            </Card>
           )}
         </section>
 
         {/* Account */}
         <Card>
           <p className="text-sm font-semibold text-ink">{user?.name}</p>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-ink-faint">
             {user?.email} · {user?.role?.toUpperCase()}
           </p>
           <Button

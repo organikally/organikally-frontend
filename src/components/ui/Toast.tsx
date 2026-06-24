@@ -37,10 +37,11 @@ export const toast = {
   info: (m: string) => useToastStore.getState().push(m, 'info'),
 };
 
-const toneClass: Record<Tone, string> = {
-  success: 'bg-success text-cream',
-  error: 'bg-danger text-cream',
-  info: 'bg-charcoal text-cream',
+// Paper card + hairline + semantic left accent (DESIGN_SYSTEM §4).
+const accentClass: Record<Tone, string> = {
+  success: 'border-l-success',
+  error: 'border-l-danger',
+  info: 'border-l-info',
 };
 
 export function ToastHost() {
@@ -53,14 +54,15 @@ export function ToastHost() {
           key={t.id}
           onClick={() => dismiss(t.id)}
           className={cn(
-            'pointer-events-auto max-w-md rounded-card px-4 py-3 text-sm font-medium shadow-card-lg',
-            'animate-[slideUp_.16s_ease-out]',
-            toneClass[t.tone],
+            'pointer-events-auto max-w-md rounded-card border border-line border-l-4 bg-paper px-4 py-3 text-sm font-medium text-ink shadow-md',
+            'animate-[toastIn_.3s_cubic-bezier(.16,1,.3,1)]',
+            accentClass[t.tone],
           )}
         >
           {t.message}
         </button>
       ))}
+      <style>{`@keyframes toastIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}`}</style>
     </div>
   );
 }

@@ -16,7 +16,7 @@ import { addDaysIso } from '@/lib/format';
 import { cn } from '@/lib/cn';
 import { REASON_CODE_LABELS } from '@/types/enums';
 import type { ReasonCode, VisitOutcome as Outcome } from '@/types/enums';
-import { PackageIcon, CheckIcon } from '@/components/ui/icons';
+import { PackageIcon, CheckIcon, XCircleIcon } from '@/components/ui/icons';
 
 export function VisitOutcome() {
   const nav = useNavigate();
@@ -112,10 +112,10 @@ export function VisitOutcome() {
               onClick={() => setOutcome('order_placed')}
               disabled={!hasOrder}
               className={cn(
-                'tap flex flex-col items-center gap-1.5 rounded-card border-2 px-3 py-4 font-semibold disabled:opacity-40',
+                'tap flex flex-col items-center gap-1.5 rounded-card border px-3 py-4 font-semibold transition-colors duration-200 ease-brand disabled:opacity-40',
                 outcome === 'order_placed'
                   ? 'border-success bg-success/5 text-success'
-                  : 'border-line text-muted',
+                  : 'border-line text-ink-faint',
               )}
             >
               <PackageIcon className="h-6 w-6" />
@@ -124,29 +124,18 @@ export function VisitOutcome() {
             <button
               onClick={() => setOutcome('no_order')}
               className={cn(
-                'tap flex flex-col items-center gap-1.5 rounded-card border-2 px-3 py-4 font-semibold',
+                'tap flex flex-col items-center gap-1.5 rounded-card border px-3 py-4 font-semibold transition-colors duration-200 ease-brand',
                 outcome === 'no_order'
                   ? 'border-danger bg-danger/5 text-danger'
-                  : 'border-line text-muted',
+                  : 'border-line text-ink-faint',
               )}
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="m15 9-6 6M9 9l6 6" />
-              </svg>
+              <XCircleIcon className="h-6 w-6" />
               No order
             </button>
           </div>
           {!hasOrder && (
-            <p className="mt-2 text-xs text-muted">
+            <p className="mt-2 text-xs text-ink-faint">
               No order was placed in this visit. Add products from the catalog if
               the owner orders.
             </p>
@@ -162,10 +151,10 @@ export function VisitOutcome() {
                   key={rc}
                   onClick={() => setReason(rc)}
                   className={cn(
-                    'tap rounded-card border-2 px-2 py-2.5 text-sm font-semibold',
+                    'tap rounded-chip border px-2 py-2.5 text-sm font-semibold transition-colors duration-200 ease-brand',
                     reason === rc
-                      ? 'border-brand bg-brand/5 text-brand'
-                      : 'border-line text-muted',
+                      ? 'border-gold-ink bg-yellow/10 text-gold-ink'
+                      : 'border-line text-ink-faint',
                   )}
                 >
                   {REASON_CODE_LABELS[rc]}
@@ -181,14 +170,14 @@ export function VisitOutcome() {
             type="date"
             value={nextDate}
             onChange={(e) => setNextDate(e.target.value)}
-            hint="Suggested date from cadence — adjust as needed."
+            hint="Suggested date from cadence. Adjust as needed."
           />
           <div className="mt-2 flex gap-2">
             {[3, 7, 14].map((d) => (
               <button
                 key={d}
                 onClick={() => setNextDate(addDaysIso(d))}
-                className="pill tap bg-surface-2 text-muted"
+                className="pill tap tnum bg-surface text-ink-muted transition-colors duration-200 ease-brand active:bg-line/60"
               >
                 +{d}d
               </button>

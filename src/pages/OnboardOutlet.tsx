@@ -77,7 +77,7 @@ export function OnboardOutlet() {
         created_by: user?.id ?? null,
       });
 
-      toast.success('Outlet queued — pending approval');
+      toast.success('Outlet queued, pending approval');
       nav(`/outlets/local:${client_uuid}`, { replace: true });
     } catch (e) {
       toast.error((e as Error).message || 'Failed to queue outlet');
@@ -201,7 +201,7 @@ export function OnboardOutlet() {
           onRead={() => void gps.read()}
           thresholdM={config.gps_accuracy_threshold_m}
         />
-        <p className="px-1 text-xs text-muted">
+        <p className="px-1 text-xs text-ink-faint">
           The GPS reading fixes this outlet's geofence centre. Submit when
           you're standing at the shop.
         </p>
