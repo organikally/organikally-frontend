@@ -94,7 +94,7 @@ registerRoute(
 // On reconnect (Background Sync), tell open clients to drain the queue.
 self.addEventListener('sync', (event) => {
   const e = event as unknown as { tag: string; waitUntil: (p: Promise<unknown>) => void };
-  if (e.tag === 'organikally-sync') {
+  if (e.tag === 'organikaly-sync') {
     e.waitUntil(notifyClients('SYNC_NOW'));
   }
 });

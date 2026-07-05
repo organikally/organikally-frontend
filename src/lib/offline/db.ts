@@ -80,7 +80,7 @@ interface OrgkDB extends DBSchema {
   kv: { key: string; value: KVRecord };
 }
 
-const DB_NAME = 'organikally-field';
+const DB_NAME = 'organikaly-field';
 const DB_VERSION = 1;
 
 let dbPromise: Promise<IDBPDatabase<OrgkDB>> | null = null;

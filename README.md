@@ -1,6 +1,6 @@
-# Organikally Field App
+# Organikaly Field App
 
-Offline-first, mobile-first field-sales app for Organikally's door-to-door reps.
+Offline-first, mobile-first field-sales app for Organikaly's door-to-door reps.
 Runs identically in a plain browser and inside the Expo WebView shell. Built to
 the cross-repo `CONTRACT.md` (API shapes, enums, brand tokens, sync protocol).
 
@@ -19,7 +19,7 @@ npm install
 npm run dev                 # http://localhost:5173
 ```
 
-Demo login (from the backend seed): `rep.delhi@organikally.in` / `Organikally@123`.
+Demo login (from the backend seed): `rep.delhi@organikaly.in` / `Organikaly@123`.
 
 ```bash
 npm run build               # tsc -b + vite build (+ injectManifest service worker)

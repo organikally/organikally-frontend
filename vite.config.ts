@@ -20,9 +20,9 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       manifest: {
-        name: 'Organikally Field',
-        short_name: 'Organikally',
-        description: 'Organikally field-sales app for door-to-door reps.',
+        name: 'Organikaly Field',
+        short_name: 'Organikaly',
+        description: 'Organikaly field-sales app for door-to-door reps.',
         theme_color: '#0E3B14',
         background_color: '#FAFAF7',
         display: 'standalone',

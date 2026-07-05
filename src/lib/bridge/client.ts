@@ -1,6 +1,6 @@
 // Typed native-bridge client with graceful plain-browser fallback.
 //
-// Inside the Expo shell the canonical client `window.OrganikallyBridge` is
+// Inside the Expo shell the canonical client `window.OrganikalyBridge` is
 // injected BEFORE the field app loads (see organikally-app/BRIDGE.md +
 // src/bridge/protocol.ts). The field app calls that client directly — it does
 // NOT re-implement the raw postMessage transport. In a plain browser the client
@@ -8,7 +8,7 @@
 // localStorage.
 //
 // A legacy raw transport (matching the canonical {id,type,payload} request and
-// the window.__organikallyDeliver response delivery) is retained only for shells
+// the window.__organikalyDeliver response delivery) is retained only for shells
 // that expose `window.ReactNativeWebView` without the injected client.
 
 import { v4 as uuid } from 'uuid';
@@ -32,11 +32,11 @@ const REQUEST_TIMEOUT_MS = 120_000;
 // treat a bare ReactNativeWebView as native (legacy raw-transport path).
 export function hasNativeBridge(): boolean {
   if (typeof window === 'undefined') return false;
-  return !!window.OrganikallyBridge?.isNative || !!window.ReactNativeWebView;
+  return !!window.OrganikalyBridge?.isNative || !!window.ReactNativeWebView;
 }
 
 function nativeClient() {
-  return typeof window !== 'undefined' ? window.OrganikallyBridge : undefined;
+  return typeof window !== 'undefined' ? window.OrganikalyBridge : undefined;
 }
 
 // ---- Adapters: canonical data shapes -> field-internal result shapes ----
@@ -62,7 +62,7 @@ function adaptCamera(d: CameraCaptureData): CameraCaptureResult {
 }
 
 // ---- Legacy raw transport (canonical envelope, no injected client) ----
-// Only used when window.ReactNativeWebView exists but OrganikallyBridge does not.
+// Only used when window.ReactNativeWebView exists but OrganikalyBridge does not.
 
 type Pending = {
   resolve: (data: unknown) => void;
@@ -94,11 +94,11 @@ function handleIncoming(raw: unknown) {
 let listenerBound = false;
 function ensureListener() {
   if (listenerBound || typeof window === 'undefined') return;
-  // The shell delivers responses by calling window.__organikallyDeliver(json).
+  // The shell delivers responses by calling window.__organikalyDeliver(json).
   // If the canonical injected client owns that hook we never bind here; this is
   // only for the legacy raw path.
-  if (!window.__organikallyDeliver) {
-    window.__organikallyDeliver = (json: string) => handleIncoming(json);
+  if (!window.__organikalyDeliver) {
+    window.__organikalyDeliver = (json: string) => handleIncoming(json);
   }
   // Some shells also dispatch a 'message' event; tolerate that too.
   window.addEventListener('message', (e) => handleIncoming(e.data));

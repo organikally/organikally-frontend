@@ -8,7 +8,7 @@ import { hasNativeBridge } from '@/lib/bridge/client';
 export function Login() {
   const nav = useNavigate();
   const { login, loading, error } = useSession();
-  const [email, setEmail] = useState('rep.delhi@organikally.in');
+  const [email, setEmail] = useState('rep.delhi@organikaly.in');
   const [password, setPassword] = useState('');
 
   async function onSubmit(e: React.FormEvent) {
@@ -29,7 +29,7 @@ export function Login() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-card bg-yellow shadow-oil">
               <span className="wordmark text-3xl text-ink">O</span>
             </div>
-            <h1 className="wordmark text-3xl text-paper">Organikally</h1>
+            <h1 className="wordmark text-3xl text-paper">Organikaly</h1>
             <p className="mt-1 text-sm text-paper/70">Field Sales</p>
           </div>
 
@@ -75,7 +75,7 @@ export function Login() {
           <p className="mt-6 text-center text-xs text-paper/60">
             {hasNativeBridge()
               ? 'Native device features enabled'
-              : 'Browser mode · demo: rep.delhi@organikally.in / Organikally@123'}
+              : 'Browser mode · demo: rep.delhi@organikaly.in / Organikaly@123'}
           </p>
         </div>
       </div>

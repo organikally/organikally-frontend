@@ -9,7 +9,7 @@ import { runBootstrap } from '@/lib/offline/bootstrap';
 import type { User } from '@/types/models';
 
 // Conventional secure-store key from the native bridge protocol
-// (organikally.auth.token) — see organikally-app/BRIDGE.md §3 secureStore.
+// (organikaly.auth.token) — see organikally-app/BRIDGE.md §3 secureStore.
 const TOKEN_KEY = AUTH_TOKEN_KEY;
 
 interface SessionState {

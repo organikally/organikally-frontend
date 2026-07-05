@@ -2,12 +2,12 @@
 //
 // CANONICAL SOURCE OF TRUTH: organikally-app/src/bridge/protocol.ts + BRIDGE.md.
 // These types MUST mirror it exactly. The shell injects a ready-made client onto
-// `window.OrganikallyBridge` before the field app loads, and the field app calls
+// `window.OrganikalyBridge` before the field app loads, and the field app calls
 // that client (it does not implement the raw transport itself). Raw transport is
 // modelled here only for the legacy fallback path.
 //
 //   web -> shell : window.ReactNativeWebView.postMessage(JSON.stringify(request))
-//   shell -> web : shell calls window.__organikallyDeliver(jsonString)
+//   shell -> web : shell calls window.__organikalyDeliver(jsonString)
 //
 // Every request carries a unique `id`. Every response echoes that `id` and is
 // EITHER a success (`ok:true` + `data`) OR a failure (`ok:false` + `error`).
@@ -133,9 +133,9 @@ export interface SecureStoreGetResult {
   value: string | null;
 }
 
-// ---- Canonical injected client (window.OrganikallyBridge) ----
+// ---- Canonical injected client (window.OrganikalyBridge) ----
 // Shape of the client the Expo shell installs; the field app calls it directly.
-export interface OrganikallyNativeBridge {
+export interface OrganikalyNativeBridge {
   isNative: true;
   version: number;
   AUTH_TOKEN_KEY: string;
@@ -163,18 +163,18 @@ export interface OrganikallyNativeBridge {
 }
 
 // SecureStore key the field app uses for the auth JWT — must match the canonical
-// protocol constant (`organikally.auth.token`, exported by protocol.ts).
-export const AUTH_TOKEN_KEY = 'organikally.auth.token' as const;
+// protocol constant (`organikaly.auth.token`, exported by protocol.ts).
+export const AUTH_TOKEN_KEY = 'organikaly.auth.token' as const;
 
 // Augment the global Window with both the canonical injected client and the raw
 // React Native WebView handle (legacy fallback transport).
 declare global {
   interface Window {
-    OrganikallyBridge?: OrganikallyNativeBridge;
+    OrganikalyBridge?: OrganikalyNativeBridge;
     ReactNativeWebView?: {
       postMessage: (message: string) => void;
     };
     // Low-level delivery hook the shell calls to push responses/events in.
-    __organikallyDeliver?: (json: string) => void;
+    __organikalyDeliver?: (json: string) => void;
   }
 }

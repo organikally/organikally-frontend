@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Organikally field-sales app — offline-first mobile web app for door-to-door reps.",
+  "description": "Organikaly field-sales app — offline-first mobile web app for door-to-door reps.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

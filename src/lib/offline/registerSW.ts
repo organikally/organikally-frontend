@@ -27,7 +27,7 @@ export async function registerServiceWorker(): Promise<void> {
     const sync = (reg as ServiceWorkerRegistration & {
       sync?: { register: (tag: string) => Promise<void> };
     }).sync;
-    if (sync) await sync.register('organikally-sync').catch(() => {});
+    if (sync) await sync.register('organikaly-sync').catch(() => {});
   } catch {
     /* unsupported — periodic timer + online event cover it */
   }

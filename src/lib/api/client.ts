@@ -1,4 +1,4 @@
-// Typed REST client for the Organikally backend (CONTRACT §1 & §4).
+// Typed REST client for the Organikaly backend (CONTRACT §1 & §4).
 //
 // - Bearer auth from the session store.
 // - List endpoints return the { items,total,page,page_size } envelope.

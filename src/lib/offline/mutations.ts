@@ -78,7 +78,7 @@ export async function enqueueOutletCreate(
   // Optimistic local outlet so it appears in lists/route immediately.
   const local: Outlet = {
     id: `local:${client_uuid}`,
-    tenant_id: 'organikally',
+    tenant_id: 'organikaly',
     name: optimistic.name,
     code: optimistic.code ?? 'PENDING',
     location: body.location,
@@ -122,7 +122,7 @@ export async function enqueueCheckIn(
   });
   const local: Visit = {
     id: `local:${client_uuid}`,
-    tenant_id: 'organikally',
+    tenant_id: 'organikaly',
     outlet_id: optimistic.outlet_id,
     rep_id: optimistic.rep_id,
     route_id: body.route_id ?? null,
@@ -260,7 +260,7 @@ export async function enqueueOrderCreate(
   const total = subtotal - discount_total + gst_total;
   const local: Order = {
     id: `local:${client_uuid}`,
-    tenant_id: 'organikally',
+    tenant_id: 'organikaly',
     code: 'PENDING',
     outlet_id: body.outlet_id,
     rep_id: '',
@@ -303,7 +303,7 @@ export async function enqueuePayment(
   const balance = 0;
   const local: Payment = {
     id: `local:${client_uuid}`,
-    tenant_id: 'organikally',
+    tenant_id: 'organikaly',
     order_id: body.order_id ?? `local:${body.order_client_uuid ?? client_uuid}`,
     outlet_id: optimistic.outlet_id,
     type: body.type,
