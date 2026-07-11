@@ -52,6 +52,10 @@ export interface OutletCreateRequest {
 // Visit check-in — POST /visits/check-in
 export interface CheckInRequest {
   outlet_id: string;
+  // When the outlet was onboarded offline its id is `local:<uuid>` and has no
+  // server row yet. Send the bare client uuid here so the server resolves the
+  // real outlet created in the same batch (mirrors `order_client_uuid`).
+  outlet_client_uuid?: string | null;
   location: GeoPoint;
   accuracy: number;
   photo_url?: string | null;
@@ -102,6 +106,9 @@ export interface OrderLineInput {
 }
 export interface OrderCreateRequest {
   outlet_id: string;
+  // As with check-in: for an outlet onboarded offline (`local:<uuid>` id) send
+  // the bare client uuid so the server resolves the real outlet on replay.
+  outlet_client_uuid?: string | null;
   visit_id?: string | null;
   warehouse_id?: string | null;
   line_items: OrderLineInput[];

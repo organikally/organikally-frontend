@@ -36,14 +36,25 @@ export interface QueuedMutation {
   label?: string;
 }
 
+export type PhotoStatus =
+  | 'pending'
+  | 'uploading'
+  | 'uploaded'
+  | 'error'
+  | 'dead'; // exceeded max attempts — owning mutation proceeds without it
+
 export interface QueuedPhoto {
   id: string; // primary key (UUID)
   kind: 'outlet' | 'visit' | 'pitch';
-  blob: Blob;
+  // The captured bytes. Cleared (undefined) once the photo has uploaded so we
+  // don't retain large blobs in IndexedDB forever; the `url` remains for token
+  // resolution.
+  blob?: Blob;
   created_at: string;
-  status: 'pending' | 'uploading' | 'uploaded' | 'error';
+  status: PhotoStatus;
   url?: string; // server url after upload
   attempts: number;
+  next_attempt_at?: number; // epoch ms for backoff gating
   last_error?: string;
 }
 
@@ -197,10 +208,16 @@ export async function listPhotos(): Promise<QueuedPhoto[]> {
   return db.getAll('photos');
 }
 
-export async function pendingPhotos(): Promise<QueuedPhoto[]> {
+// Photos eligible for an upload attempt right now: not yet uploaded, not
+// dead-lettered, and past their backoff window.
+export async function pendingPhotos(now = Date.now()): Promise<QueuedPhoto[]> {
   const db = await getDB();
   const all = await db.getAll('photos');
-  return all.filter((p) => p.status === 'pending' || p.status === 'error');
+  return all.filter(
+    (p) =>
+      (p.status === 'pending' || p.status === 'error') &&
+      (p.next_attempt_at ?? 0) <= now,
+  );
 }
 
 export async function updatePhoto(
@@ -300,4 +317,133 @@ export async function clearAll(): Promise<void> {
   ] as const) {
     await db.clear(store);
   }
+}
+
+// ---- Sync reconciliation (CONTRACT §7.3) ----
+//
+// After a mutation replays, the server returns the canonical `server_id`. We
+// swap the optimistic `local:<uuid>` row for the real id so lists show exactly
+// one record per entity and any still-queued dependents point at the real id.
+
+// Re-key the optimistic `local:<clientUuid>` record to its server id. The
+// server copy (fetched on the next list refresh) shares that key, so it
+// overwrites in place — never a duplicate row. Concrete store literals keep the
+// idb value types precise.
+export async function replaceOptimisticEntity(
+  type: MutationType,
+  clientUuid: string,
+  serverId: string | undefined,
+): Promise<void> {
+  const db = await getDB();
+  const localId = `local:${clientUuid}`;
+  switch (type) {
+    case 'outlet.create': {
+      const e = await db.get('outlets', localId);
+      if (!e) return;
+      await db.delete('outlets', localId);
+      if (serverId) await db.put('outlets', { ...e, id: serverId });
+      return;
+    }
+    case 'order.create': {
+      const e = await db.get('orders', localId);
+      if (!e) return;
+      await db.delete('orders', localId);
+      if (serverId) await db.put('orders', { ...e, id: serverId });
+      return;
+    }
+    case 'visit.check_in': {
+      const e = await db.get('visits', localId);
+      if (!e) return;
+      await db.delete('visits', localId);
+      if (serverId) await db.put('visits', { ...e, id: serverId });
+      return;
+    }
+    case 'payment.create': {
+      const e = await db.get('payments', localId);
+      if (!e) return;
+      await db.delete('payments', localId);
+      if (serverId) await db.put('payments', { ...e, id: serverId });
+      return;
+    }
+    default:
+      return; // check_out / outcome carry no own optimistic create-record
+  }
+}
+
+// Rewrite `local:<uuid>` foreign keys inside still-cached dependent records to
+// their resolved server ids so lists render the real linkage immediately.
+export async function rewriteLocalReferences(
+  idMap: Record<string, string>,
+): Promise<void> {
+  if (Object.keys(idMap).length === 0) return;
+  const db = await getDB();
+  const remap = (v: string | null | undefined): string | undefined =>
+    typeof v === 'string' && idMap[v] ? idMap[v] : undefined;
+
+  for (const o of await db.getAll('orders')) {
+    const outlet = remap(o.outlet_id);
+    const visit = remap(o.visit_id);
+    if (outlet || visit) {
+      await db.put('orders', {
+        ...o,
+        outlet_id: outlet ?? o.outlet_id,
+        visit_id: visit ?? o.visit_id ?? null,
+      });
+    }
+  }
+  for (const v of await db.getAll('visits')) {
+    const outlet = remap(v.outlet_id);
+    const order = remap(v.order_id);
+    if (outlet || order) {
+      await db.put('visits', {
+        ...v,
+        outlet_id: outlet ?? v.outlet_id,
+        order_id: order ?? v.order_id ?? null,
+      });
+    }
+  }
+  for (const p of await db.getAll('payments')) {
+    const outlet = remap(p.outlet_id);
+    const order = remap(p.order_id);
+    if (outlet || order) {
+      await db.put('payments', {
+        ...p,
+        outlet_id: outlet ?? p.outlet_id,
+        order_id: order ?? p.order_id,
+      });
+    }
+  }
+}
+
+// Rewrite `local:<uuid>` references embedded in the payloads of mutations that
+// are still queued (e.g. an order whose outlet onboarded in an earlier batch).
+export async function rewriteQueuedMutationRefs(
+  idMap: Record<string, string>,
+): Promise<void> {
+  if (Object.keys(idMap).length === 0) return;
+  const db = await getDB();
+  const all = await db.getAll('mutations');
+  for (const m of all) {
+    let json = JSON.stringify(m.payload ?? null);
+    let changed = false;
+    for (const [localId, serverId] of Object.entries(idMap)) {
+      if (json.includes(localId)) {
+        json = json.split(localId).join(serverId);
+        changed = true;
+      }
+    }
+    if (changed) {
+      await db.put('mutations', { ...m, payload: JSON.parse(json) });
+    }
+  }
+}
+
+// Purge the workbox HTTP caches that hold the previous rep's data on a shared
+// device (IndexedDB is wiped by clearAll(); this clears Cache Storage).
+export async function purgeApiCaches(): Promise<void> {
+  if (typeof caches === 'undefined') return;
+  await Promise.allSettled([
+    caches.delete('api-get'),
+    caches.delete('media'),
+  ]);
 }

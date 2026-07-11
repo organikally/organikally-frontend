@@ -59,8 +59,14 @@ export function VisitOrder() {
     try {
       const client_uuid = active!.orderClientUuid ?? newClientUuid();
       const idempotency_key = client_uuid;
+      // For an outlet onboarded offline (`local:<uuid>` id) pass the bare uuid so
+      // the server resolves the real outlet created in the same batch.
+      const outletClientUuid = active!.outletId.startsWith('local:')
+        ? active!.outletId.slice('local:'.length)
+        : undefined;
       const body: OrderCreateRequest = {
         outlet_id: active!.outletId,
+        outlet_client_uuid: outletClientUuid,
         visit_id: null, // server links via visit client_uuid on replay
         line_items: lines.map(({ line }) => ({
           sku_id: line.sku_id,

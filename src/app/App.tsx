@@ -24,6 +24,11 @@ export function App() {
   const hydrateVisit = useVisitFlow((s) => s.hydrate);
 
   useEffect(() => {
+    // On token expiry the sync loop hands off here: tear down the session
+    // (queue preserved) so RequireAuth routes to /login.
+    syncEngine.onAuthError(() => {
+      void useSession.getState().sessionExpired();
+    });
     void restore();
     void hydrateVisit();
     syncEngine.start();

@@ -1,5 +1,6 @@
-import { Navigate, createBrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
+import { useBridgeEvents } from '@/hooks/useBridgeEvents';
 import { AppShell } from '@/components/layout/AppShell';
 import { Login } from '@/pages/Login';
 import { Today } from '@/pages/Today';
@@ -17,11 +18,21 @@ import { Orders } from '@/pages/Orders';
 import { OrderDetail } from '@/pages/OrderDetail';
 import { SyncStatus } from '@/pages/SyncStatus';
 
+// Pathless root layout: mounts native-bridge event wiring (deep-link push +
+// hardware back) inside the router so it has navigation available.
+function RootLayout() {
+  useBridgeEvents();
+  return <Outlet />;
+}
+
 export const router = createBrowserRouter([
-  { path: '/login', element: <Login /> },
   {
-    element: <RequireAuth />,
+    element: <RootLayout />,
     children: [
+      { path: '/login', element: <Login /> },
+      {
+        element: <RequireAuth />,
+        children: [
       // Full-screen flows (no bottom nav)
       { path: '/outlets/onboard', element: <OnboardOutlet /> },
       { path: '/outlets/:id', element: <OutletDetail /> },
@@ -31,20 +42,22 @@ export const router = createBrowserRouter([
       { path: '/visit/order', element: <VisitOrder /> },
       { path: '/visit/payment', element: <VisitPayment /> },
       { path: '/visit/outcome', element: <VisitOutcome /> },
-      { path: '/orders/:id', element: <OrderDetail /> },
-      // Tabbed shell
-      {
-        element: <AppShell />,
-        children: [
-          { index: true, element: <Navigate to="/today" replace /> },
-          { path: '/today', element: <Today /> },
-          { path: '/outlets', element: <Outlets /> },
-          { path: '/route', element: <RouteView /> },
-          { path: '/orders', element: <Orders /> },
-          { path: '/sync', element: <SyncStatus /> },
+          { path: '/orders/:id', element: <OrderDetail /> },
+          // Tabbed shell
+          {
+            element: <AppShell />,
+            children: [
+              { index: true, element: <Navigate to="/today" replace /> },
+              { path: '/today', element: <Today /> },
+              { path: '/outlets', element: <Outlets /> },
+              { path: '/route', element: <RouteView /> },
+              { path: '/orders', element: <Orders /> },
+              { path: '/sync', element: <SyncStatus /> },
+            ],
+          },
         ],
       },
+      { path: '*', element: <Navigate to="/today" replace /> },
     ],
   },
-  { path: '*', element: <Navigate to="/today" replace /> },
 ]);

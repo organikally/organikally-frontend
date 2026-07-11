@@ -19,7 +19,7 @@ npm install
 npm run dev                 # http://localhost:5173
 ```
 
-Demo login (from the backend seed): `rep.delhi@organikaly.in` / `Organikaly@123`.
+Sign in with a provisioned field-rep account from the backend.
 
 ```bash
 npm run build               # tsc -b + vite build (+ injectManifest service worker)

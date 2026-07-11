@@ -14,6 +14,8 @@
 import { v4 as uuid } from 'uuid';
 import {
   AUTH_TOKEN_KEY,
+  type BridgeEvent,
+  type BridgeEventName,
   type BridgeRequest,
   type BridgeRequestType,
   type BridgeResponse,
@@ -21,6 +23,7 @@ import {
   type CameraCaptureResult,
   type LocationData,
   type LocationResult,
+  type PhotoKind,
   type PushTokenResult,
 } from './types';
 
@@ -72,23 +75,73 @@ type Pending = {
 
 const pending = new Map<string, Pending>();
 
+// ---- Unsolicited shell -> web events (push.opened, app.backPressed, …) ----
+// The canonical injected client exposes `.on(event, handler)`. For the legacy
+// raw transport (bare ReactNativeWebView) the shell delivers events without an
+// `id`, which we route through this in-process bus.
+const eventListeners = new Map<BridgeEventName, Set<(data: unknown) => void>>();
+
+function dispatchBridgeEvent(event: BridgeEventName, data: unknown) {
+  const set = eventListeners.get(event);
+  if (!set) return;
+  for (const fn of set) {
+    try {
+      fn(data);
+    } catch {
+      /* a listener throwing must not break delivery to others */
+    }
+  }
+}
+
 function handleIncoming(raw: unknown) {
-  let msg: BridgeResponse | null = null;
+  let msg: BridgeResponse | BridgeEvent | null = null;
   try {
     msg =
       typeof raw === 'string'
-        ? (JSON.parse(raw) as BridgeResponse)
-        : (raw as BridgeResponse);
+        ? (JSON.parse(raw) as BridgeResponse | BridgeEvent)
+        : (raw as BridgeResponse | BridgeEvent);
   } catch {
     return;
   }
-  if (!msg || typeof (msg as BridgeResponse).id !== 'string') return;
-  const p = pending.get(msg.id);
+  if (!msg) return;
+  // Unsolicited event: has `event`, no correlation `id`.
+  const asEvent = msg as BridgeEvent;
+  if (typeof asEvent.event === 'string' && (msg as BridgeResponse).id === undefined) {
+    dispatchBridgeEvent(asEvent.event, asEvent.data);
+    return;
+  }
+  const resp = msg as BridgeResponse;
+  if (typeof resp.id !== 'string') return;
+  const p = pending.get(resp.id);
   if (!p) return;
   clearTimeout(p.timer);
-  pending.delete(msg.id);
-  if (msg.ok) p.resolve(msg.data);
-  else p.reject(new Error(msg.error?.message || 'bridge error'));
+  pending.delete(resp.id);
+  if (resp.ok) p.resolve(resp.data);
+  else p.reject(new Error(resp.error?.message || 'bridge error'));
+}
+
+// Subscribe to a shell event. Returns an unsubscribe fn. Prefers the canonical
+// injected client's `.on`; otherwise uses the legacy-transport bus. In a plain
+// browser (no shell) this is an inert no-op — there are no native events.
+export function onBridgeEvent(
+  event: BridgeEventName,
+  handler: (data: unknown) => void,
+): () => void {
+  const client = nativeClient();
+  if (client?.on) return client.on(event, handler);
+  if (typeof window === 'undefined' || !window.ReactNativeWebView) {
+    return () => {};
+  }
+  ensureListener();
+  let set = eventListeners.get(event);
+  if (!set) {
+    set = new Set();
+    eventListeners.set(event, set);
+  }
+  set.add(handler);
+  return () => {
+    set?.delete(handler);
+  };
 }
 
 let listenerBound = false;
@@ -130,7 +183,9 @@ function callRaw(type: BridgeRequestType, payload?: unknown): Promise<unknown> {
 
 export interface Bridge {
   isNative: boolean;
-  capturePhoto(): Promise<CameraCaptureResult>;
+  // `kind` tags the capture so the shell/backend files it under the right S3
+  // prefix (outlet / visit / pitch).
+  capturePhoto(kind?: PhotoKind): Promise<CameraCaptureResult>;
   getLocation(): Promise<LocationResult>;
   getPushToken(): Promise<PushTokenResult | null>;
   secureSet(key: string, value: string): Promise<void>;
@@ -215,11 +270,13 @@ export const bridge: Bridge = {
     return hasNativeBridge();
   },
 
-  async capturePhoto() {
+  async capturePhoto(kind) {
     const client = nativeClient();
-    if (client) return adaptCamera(await client.capturePhoto({}));
+    if (client) return adaptCamera(await client.capturePhoto({ kind }));
     if (window.ReactNativeWebView)
-      return adaptCamera((await callRaw('camera.capture', {})) as CameraCaptureData);
+      return adaptCamera(
+        (await callRaw('camera.capture', { kind })) as CameraCaptureData,
+      );
     return browserCapturePhoto();
   },
 

@@ -94,6 +94,7 @@ export function OnboardOutlet() {
           value={photo}
           onCapture={setPhoto}
           label="Shop front (live photo) *"
+          kind="outlet"
         />
 
         <Card className="space-y-4">

@@ -60,10 +60,19 @@ export interface BridgeResponseError {
 export type BridgeResponse = BridgeResponseOk | BridgeResponseError;
 
 // Unsolicited shell -> web event (no `id`).
+export type BridgeEventName =
+  | 'push.received'
+  | 'push.opened'
+  | 'app.backPressed'
+  | 'app.state';
+
 export interface BridgeEvent<D = unknown> {
-  event: 'push.received' | 'push.opened' | 'app.backPressed' | 'app.state';
+  event: BridgeEventName;
   data: D;
 }
+
+// S3-layout tag for a captured photo (passed through to camera.capture).
+export type PhotoKind = 'outlet' | 'visit' | 'pitch';
 
 // ---- Canonical response DATA shapes (subset the field app consumes) ----
 

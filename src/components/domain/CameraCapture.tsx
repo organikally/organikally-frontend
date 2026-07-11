@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { bridge } from '@/lib/bridge/client';
+import type { PhotoKind } from '@/lib/bridge/types';
 import { CameraIcon } from '@/components/ui/icons';
 import { Spinner } from '@/components/ui/Spinner';
 import { toast } from '@/components/ui/Toast';
@@ -13,16 +14,23 @@ interface Props {
   value: string | null; // data URL
   onCapture: (dataUrl: string) => void;
   label?: string;
+  // Tags the capture for the backend S3 layout (outlet / visit / pitch).
+  kind: PhotoKind;
 }
 
-export function CameraCapture({ value, onCapture, label = 'Live photo' }: Props) {
+export function CameraCapture({
+  value,
+  onCapture,
+  label = 'Live photo',
+  kind,
+}: Props) {
   const [busy, setBusy] = useState(false);
 
   async function capture() {
     setBusy(true);
     try {
       bridge.haptic('light');
-      const res = await bridge.capturePhoto();
+      const res = await bridge.capturePhoto(kind);
       const dataUrl = res.dataUrl;
       if (!dataUrl) {
         // Native returned a fileUri rather than a data URL.

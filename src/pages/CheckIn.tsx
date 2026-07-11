@@ -73,8 +73,15 @@ export function CheckIn() {
       const blob = await dataUrlToBlob(photo);
       const photoToken = await queuePhoto(blob, 'visit');
 
+      // If this outlet was onboarded offline its id is `local:<uuid>`; pass the
+      // bare uuid so the server resolves the real outlet on batch replay.
+      const outletClientUuid = outlet!.id.startsWith('local:')
+        ? outlet!.id.slice('local:'.length)
+        : undefined;
+
       const body: CheckInRequest = {
         outlet_id: outlet!.id,
+        outlet_client_uuid: outletClientUuid,
         location: latLngToPoint(gps.reading.lat, gps.reading.lng),
         accuracy: gps.reading.accuracy,
         photo_url: photoToken,
@@ -157,6 +164,7 @@ export function CheckIn() {
           value={photo}
           onCapture={setPhoto}
           label="Live photo at shop *"
+          kind="visit"
         />
 
         {needsFlag && (

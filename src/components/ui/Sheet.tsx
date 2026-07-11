@@ -20,10 +20,18 @@ export function Sheet({
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    // Native/hardware back (Android) is delivered as a cancelable event by the
+    // bridge wiring; consume it to close the sheet instead of popping the route.
+    const onBack = (e: Event) => {
+      e.preventDefault();
+      onClose();
+    };
     window.addEventListener('keydown', onKey);
+    window.addEventListener('orgk:backpressed', onBack);
     document.body.style.overflow = 'hidden';
     return () => {
       window.removeEventListener('keydown', onKey);
+      window.removeEventListener('orgk:backpressed', onBack);
       document.body.style.overflow = '';
     };
   }, [open, onClose]);
