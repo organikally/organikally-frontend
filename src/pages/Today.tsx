@@ -65,25 +65,27 @@ export function Today() {
           </div>
         </Card>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Quick actions — compact tiles, never wrap on narrow screens */}
+        <div className="grid grid-cols-2 gap-2.5">
           <Button
             variant="gold"
-            size="lg"
-            leftIcon={<PlusIcon className="h-5 w-5" />}
+            size="sm"
+            block
+            leftIcon={<PlusIcon className="h-4 w-4 shrink-0" />}
             onClick={() => nav('/outlets/onboard')}
-            className="!justify-start"
+            className="min-h-12"
           >
-            Onboard outlet
+            <span className="truncate">Onboard outlet</span>
           </Button>
           <Button
             variant="outline"
-            size="lg"
-            leftIcon={<RouteIcon className="h-5 w-5" />}
+            size="sm"
+            block
+            leftIcon={<RouteIcon className="h-4 w-4 shrink-0" />}
             onClick={() => nav('/route')}
-            className="!justify-start"
+            className="min-h-12"
           >
-            View route map
+            <span className="truncate">Route map</span>
           </Button>
         </div>
 

@@ -23,7 +23,8 @@ const variantClass: Record<Variant, string> = {
 const sizeClass: Record<Size, string> = {
   sm: 'text-sm px-3.5 min-h-9',
   md: 'text-base',
-  lg: 'text-lg px-6 min-h-[52px]',
+  // lg = primary action bar / submit. Comfortable 48px target without shouting.
+  lg: 'text-base px-5 min-h-12',
 };
 
 export function Button({
