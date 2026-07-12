@@ -38,32 +38,45 @@ export function Today() {
       />
 
       <div className="space-y-4 p-4">
-        {/* Route progress */}
-        <Card className="border-ink bg-ink text-paper">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="eyebrow text-yellow before:bg-yellow/60">Today's route</p>
-              <p className="mt-1.5 text-2xl font-semibold tabular-nums">
-                {done}/{planned}
-                <span className="ml-1 text-sm font-normal text-paper/70">
-                  visited
-                </span>
-              </p>
+        {/* Header: route progress when a route exists, else area framing —
+            reps discover and onboard shops themselves, routes aren't required. */}
+        {planned > 0 ? (
+          <Card className="border-ink bg-ink text-paper">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="eyebrow text-yellow before:bg-yellow/60">
+                  Today's route
+                </p>
+                <p className="mt-1.5 text-2xl font-semibold tabular-nums">
+                  {done}/{planned}
+                  <span className="ml-1 text-sm font-normal text-paper/70">
+                    visited
+                  </span>
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-display text-4xl tabular-nums text-yellow">
+                  {progress}%
+                </p>
+                <p className="text-xs text-paper/70">complete</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="font-display text-4xl tabular-nums text-yellow">
-                {progress}%
-              </p>
-              <p className="text-xs text-paper/70">complete</p>
+            <div className="mt-3 h-2 overflow-hidden rounded-pill bg-paper/20">
+              <div
+                className="h-full rounded-pill bg-yellow transition-all duration-300 ease-brand"
+                style={{ width: `${progress}%` }}
+              />
             </div>
-          </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-pill bg-paper/20">
-            <div
-              className="h-full rounded-pill bg-yellow transition-all duration-300 ease-brand"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </Card>
+          </Card>
+        ) : (
+          <Card className="border-ink bg-ink text-paper">
+            <p className="eyebrow text-yellow before:bg-yellow/60">Your area</p>
+            <p className="mt-1.5 font-display text-xl">Work your area</p>
+            <p className="mt-1 text-sm text-paper/70">
+              Find shops nearby, add them on the spot, and take the first order.
+            </p>
+          </Card>
+        )}
 
         {/* Quick actions — compact tiles, never wrap on narrow screens */}
         <div className="grid grid-cols-2 gap-2.5">
@@ -89,10 +102,12 @@ export function Today() {
           </Button>
         </div>
 
-        {/* Route outlets */}
+        {/* Route outlets (when a route exists) / area prompt otherwise */}
         <section>
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="font-display text-lg text-ink">Route outlets</h2>
+            <h2 className="font-display text-lg text-ink">
+              {planned > 0 ? 'Route outlets' : 'Your area'}
+            </h2>
             {planned > 0 && (
               <button
                 onClick={() => nav('/route')}
@@ -113,10 +128,21 @@ export function Today() {
           ) : outlets.length === 0 ? (
             <EmptyState
               icon={<MapPinIcon className="h-10 w-10" />}
-              title="No route for today"
-              body="Onboard a prospect or browse all outlets to start visiting."
+              title="No route assigned"
+              body="Start by finding and onboarding shops in your area — add them on the spot and take the first order."
               action={
-                <Button onClick={() => nav('/outlets')}>Browse outlets</Button>
+                <div className="flex flex-col items-stretch gap-2">
+                  <Button
+                    variant="gold"
+                    leftIcon={<PlusIcon className="h-4 w-4 shrink-0" />}
+                    onClick={() => nav('/outlets/onboard')}
+                  >
+                    Onboard outlet
+                  </Button>
+                  <Button variant="ghost" onClick={() => nav('/outlets')}>
+                    Browse outlets
+                  </Button>
+                </div>
               }
             />
           ) : (

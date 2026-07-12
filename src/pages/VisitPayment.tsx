@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { EmptyState } from '@/components/ui/Spinner';
 import { VisitStepper } from '@/components/domain/VisitStepper';
+import { AlertIcon } from '@/components/ui/icons';
 import { toast } from '@/components/ui/Toast';
 import { useVisitFlow } from '@/stores/visitFlow';
+import { useOutlet } from '@/features/outlet/data';
+import { useConfig } from '@/hooks/useConfig';
 import { useCatalog, computeCartTotals } from '@/features/catalog/data';
 import { inr, addDaysIso, fmtDate } from '@/lib/format';
 import { cn } from '@/lib/cn';
@@ -29,12 +32,23 @@ export function VisitPayment() {
   const active = useVisitFlow((s) => s.active);
   const setPaymentDraft = useVisitFlow((s) => s.setPayment);
   const { data: catalog } = useCatalog();
+  const { data: outlet } = useOutlet(active?.outletId);
 
   const totals = useMemo(
     () => computeCartTotals(active?.cart ?? {}, catalog ?? []),
     [active?.cart, catalog],
   );
   const orderTotal = totals.total;
+
+  // Credit-cap awareness: surface the outlet's ceiling (new outlets default to
+  // the tenant's new_outlet_credit_limit) so the rep isn't surprised by a
+  // server-side rejection. Non-blocking — the server enforces the ceiling.
+  // A just-onboarded outlet is still keyed by its local: id, so fall back to
+  // the tenant default cap until the server record resolves.
+  const config = useConfig();
+  const creditLimit =
+    outlet?.credit_limit ?? config.new_outlet_credit_limit ?? 0;
+  const creditAvailable = Math.max(0, creditLimit - (outlet?.outstanding ?? 0));
 
   const [type, setType] = useState<PaymentType>('credit');
   const [method, setMethod] = useState<PaymentMethod>('cash');
@@ -73,6 +87,9 @@ export function VisitPayment() {
   const balance = Math.max(0, orderTotal - collected);
   const dueDate =
     balance > 0 && creditDays > 0 ? addDaysIso(creditDays) : null;
+  // The unsettled balance is what rides on credit; warn (don't block) if it
+  // exceeds the outlet's available credit.
+  const overCredit = creditLimit > 0 && balance > creditAvailable;
 
   async function submit() {
     if (type === 'partial' && (amount <= 0 || amount > orderTotal))
@@ -124,7 +141,31 @@ export function VisitPayment() {
               {inr(orderTotal)}
             </span>
           </div>
+          {creditLimit > 0 && (
+            <div className="mt-2 flex items-center justify-between border-t border-paper/15 pt-2 text-sm">
+              <span className="text-paper/70">Credit available</span>
+              <span
+                className={cn(
+                  'font-semibold tnum',
+                  overCredit ? 'text-warning' : 'text-paper',
+                )}
+              >
+                {inr(creditAvailable)}
+              </span>
+            </div>
+          )}
         </Card>
+
+        {overCredit && (
+          <Card className="border-warning/50 bg-warning/5">
+            <p className="flex items-start gap-1.5 text-sm text-warning">
+              <AlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
+              Credit balance {inr(balance)} is over the available limit of{' '}
+              {inr(creditAvailable)} — the server may cap or reject it. Collect
+              more up front to stay within limit.
+            </p>
+          </Card>
+        )}
 
         <Card>
           <span className="field-label">Payment type</span>

@@ -38,7 +38,9 @@ export interface LoginResponse {
   user: User;
 }
 
-// Outlet onboarding (field) — POST /outlets
+// Outlet onboarding (field) — POST /outlets. Creates the outlet active
+// immediately (no pending_approval); the server de-dupes by phone/gstin and
+// returns the existing outlet instead of creating a duplicate.
 export interface OutletCreateRequest {
   name: string;
   location: GeoPoint;
@@ -47,6 +49,24 @@ export interface OutletCreateRequest {
   outlet_class?: string;
   territory_id?: string | null;
   client_uuid: string;
+}
+
+// Outlet de-dupe (field) — GET /outlets/dedupe?near=lng,lat&phone=&gstin=&name=
+// Called BEFORE creating to warn the rep about a shop that may already exist.
+export type DedupeMatch = 'phone' | 'gstin' | 'name' | 'proximity';
+export interface DedupeCandidate extends Outlet {
+  distance_m: number;
+  match: DedupeMatch;
+}
+export interface DedupeQuery {
+  near?: string; // "lng,lat"
+  phone?: string;
+  gstin?: string;
+  name?: string;
+}
+export interface DedupeResponse {
+  items: DedupeCandidate[];
+  total: number;
 }
 
 // Visit check-in — POST /visits/check-in

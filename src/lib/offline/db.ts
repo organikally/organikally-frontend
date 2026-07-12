@@ -26,6 +26,9 @@ export interface QueuedMutation {
   payload: unknown;
   idempotency_key: string;
   created_at: string;
+  // Monotonic enqueue order — breaks created_at ties so a dependent mutation
+  // (e.g. check-in) never sorts ahead of its parent (outlet.create).
+  seq?: number;
   status: QueueStatus;
   attempts: number;
   next_attempt_at: number; // epoch ms for backoff scheduling
@@ -141,12 +144,17 @@ export async function kvGet<T>(key: string): Promise<T | undefined> {
 
 // ---- Mutation queue ----
 
+// Monotonic counter so mutations enqueued within the same millisecond keep
+// their insertion order (getAll returns key order, not insertion order).
+let _mutationSeq = 0;
+
 export async function enqueueMutation(
   m: Omit<QueuedMutation, 'status' | 'attempts' | 'next_attempt_at'>,
 ): Promise<void> {
   const db = await getDB();
   await db.put('mutations', {
     ...m,
+    seq: m.seq ?? ++_mutationSeq,
     status: 'pending',
     attempts: 0,
     next_attempt_at: 0,
@@ -156,7 +164,10 @@ export async function enqueueMutation(
 export async function listMutations(): Promise<QueuedMutation[]> {
   const db = await getDB();
   const all = await db.getAll('mutations');
-  return all.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  return all.sort(
+    (a, b) =>
+      a.created_at.localeCompare(b.created_at) || (a.seq ?? 0) - (b.seq ?? 0),
+  );
 }
 
 export async function getSendableMutations(now = Date.now()): Promise<

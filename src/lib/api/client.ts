@@ -8,6 +8,8 @@
 import type {
   CheckInRequest,
   CheckOutRequest,
+  DedupeQuery,
+  DedupeResponse,
   ListEnvelope,
   LoginRequest,
   LoginResponse,
@@ -193,8 +195,18 @@ export const api = {
   outletVisits(id: string) {
     return request<ListEnvelope<Visit>>(`/outlets/${id}/visits`);
   },
-  outletDedupe(id: string, near: string) {
-    return request<Outlet[]>(`/outlets/${id}/dedupe`, { query: { near } });
+  // Pre-create de-dupe: warn about a shop that may already exist by proximity,
+  // phone, gstin or name. `near` is "lng,lat". Returns { items, total } where
+  // each item is an Outlet + { distance_m, match }.
+  dedupeOutlets(query: DedupeQuery) {
+    return request<DedupeResponse>('/outlets/dedupe', {
+      query: {
+        near: query.near,
+        phone: query.phone,
+        gstin: query.gstin,
+        name: query.name,
+      },
+    });
   },
 
   // ---- Visits ----

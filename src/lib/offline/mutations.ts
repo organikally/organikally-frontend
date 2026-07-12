@@ -86,8 +86,10 @@ export async function enqueueOutletCreate(
     photos: [],
     profile: body.profile,
     outlet_class: (optimistic.outlet_class as Outlet['outlet_class']) ?? 'C',
-    status: 'pending_approval',
-    credit_limit: 0,
+    // Field-added outlets are active immediately (no approval step). The server
+    // hard-de-dupes by phone/gstin and is authoritative on replay.
+    status: optimistic.status ?? 'active',
+    credit_limit: optimistic.credit_limit ?? 0,
     outstanding: 0,
     assigned_rep_id: optimistic.assigned_rep_id ?? null,
     territory_id: body.territory_id ?? null,

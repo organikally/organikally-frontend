@@ -43,6 +43,9 @@ export interface TenantConfig {
   reason_codes: ReasonCode[];
   outlet_custom_fields: OutletCustomField[];
   dormant_days: number; // default 45
+  // Credit ceiling applied to field-added (new) outlets. Surfaced on the
+  // payment screen so the rep isn't surprised by a server-side rejection.
+  new_outlet_credit_limit: number; // default 5000
 }
 
 export interface OutletCustomField {

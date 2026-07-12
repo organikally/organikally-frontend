@@ -74,4 +74,5 @@ export const DEFAULT_CONFIG: TenantConfig = {
   ],
   outlet_custom_fields: [],
   dormant_days: 45,
+  new_outlet_credit_limit: 5000,
 };
