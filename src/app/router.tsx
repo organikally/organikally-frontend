@@ -3,6 +3,7 @@ import { RequireAuth } from './RequireAuth';
 import { useBridgeEvents } from '@/hooks/useBridgeEvents';
 import { AppShell } from '@/components/layout/AppShell';
 import { Login } from '@/pages/Login';
+import { Privacy } from '@/pages/Privacy';
 import { Today } from '@/pages/Today';
 import { Outlets } from '@/pages/Outlets';
 import { RouteView } from '@/pages/RouteView';
@@ -30,6 +31,8 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: '/login', element: <Login /> },
+      // Public — reachable pre-auth from the Login footer and onboarding consent.
+      { path: '/privacy', element: <Privacy /> },
       {
         element: <RequireAuth />,
         children: [

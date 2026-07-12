@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components/layout/TopBar';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -69,6 +69,9 @@ export function OnboardOutlet() {
   });
   const [outletClass, setOutletClass] = useState('C');
   const [submitting, setSubmitting] = useState(false);
+  // DPDP: rep confirms the shop owner consented to storing their PII. Required
+  // before we can create the outlet; recorded on the outlet for audit.
+  const [piiConsent, setPiiConsent] = useState(false);
 
   // De-dupe: warn (non-blocking) about a shop that may already exist.
   const [candidates, setCandidates] = useState<DedupeCandidate[]>([]);
@@ -143,6 +146,10 @@ export function OnboardOutlet() {
 
   async function create() {
     if (!validate()) return;
+    if (!piiConsent) {
+      toast.error("Confirm the shop owner's consent to continue");
+      return;
+    }
     setSubmitting(true);
     try {
       const client_uuid = newClientUuid();
@@ -151,12 +158,22 @@ export function OnboardOutlet() {
       const outletPhotoToken = await queuePhoto(blob, 'outlet');
       const visitPhotoToken = await queuePhoto(blob, 'visit');
 
+      // DPDP: stamp the shop-owner PII consent onto the outlet (free-form
+      // profile.custom the backend already accepts — no schema change).
+      const profileWithConsent: OutletProfile = {
+        ...profile,
+        custom: {
+          ...((profile.custom as Record<string, unknown>) ?? {}),
+          pii_consent: { given: true, at: new Date().toISOString() },
+        },
+      };
+
       const point = latLngToPoint(gps.reading!.lat, gps.reading!.lng);
       const body: OutletCreateRequest = {
         name: name.trim(),
         location: point,
         photos: [outletPhotoToken],
-        profile,
+        profile: profileWithConsent,
         outlet_class: outletClass,
         territory_id: user?.territory_ids?.[0] ?? null,
         client_uuid,
@@ -210,6 +227,8 @@ export function OnboardOutlet() {
 
   function submit() {
     if (!validate()) return;
+    if (!piiConsent)
+      return toast.error("Confirm the shop owner's consent to continue");
     // Exact phone/gstin match → make the rep confirm before creating.
     if (hasExact && !dupConfirmed)
       return toast.error('This shop may already exist — confirm below');
@@ -400,6 +419,24 @@ export function OnboardOutlet() {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-xl border-t border-line bg-surface/98 p-3 backdrop-blur pb-safe">
+        <label className="mb-3 flex cursor-pointer items-start gap-2.5 text-sm leading-snug text-ink-muted">
+          <input
+            type="checkbox"
+            checked={piiConsent}
+            onChange={(e) => setPiiConsent(e.target.checked)}
+            className="mt-0.5 h-5 w-5 shrink-0 accent-yellow"
+          />
+          <span>
+            I&apos;ve taken the shop owner&apos;s consent to store their name,
+            phone and GST for orders and delivery.{' '}
+            <Link
+              to="/privacy"
+              className="font-medium text-gold-ink underline"
+            >
+              Privacy &amp; data
+            </Link>
+          </span>
+        </label>
         <Button
           variant="gold"
           size="lg"

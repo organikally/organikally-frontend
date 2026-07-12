@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSession } from '@/stores/session';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -72,7 +72,14 @@ export function Login() {
             </div>
           </form>
 
-          <p className="mt-6 text-center text-xs text-paper/60">
+          <p className="mt-6 text-center text-xs leading-relaxed text-paper/70">
+            By signing in you agree your location is recorded during visits —{' '}
+            <Link to="/privacy" className="font-medium text-yellow underline">
+              Privacy &amp; data
+            </Link>
+            .
+          </p>
+          <p className="mt-3 text-center text-xs text-paper/50">
             {hasNativeBridge() ? 'Native device features enabled' : 'Browser mode'}
           </p>
         </div>
