@@ -135,3 +135,15 @@ export const XCircleIcon = (p: P) => (
     <path d="m15 9-6 6M9 9l6 6" />
   </svg>
 );
+export const BellIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z" />
+    <path d="M10.5 20a2 2 0 0 0 3 0" />
+  </svg>
+);
+export const CheckCheckIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M2 13.5 6 17.5 13 9" />
+    <path d="m12 15 1.5 1.5L21 8" />
+  </svg>
+);

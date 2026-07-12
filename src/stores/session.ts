@@ -7,6 +7,7 @@ import { bridge, AUTH_TOKEN_KEY } from '@/lib/bridge/client';
 import { kvGet, kvSet, clearAll, purgeApiCaches } from '@/lib/offline/db';
 import { runBootstrap } from '@/lib/offline/bootstrap';
 import { syncEngine } from '@/lib/offline/sync';
+import { registerPushToken } from '@/lib/push/registerPush';
 import type { User } from '@/types/models';
 
 // Conventional secure-store key from the native bridge protocol
@@ -43,8 +44,8 @@ export const useSession = create<SessionState>((set) => ({
       await kvSet('user', res.user);
       syncEngine.resetAuth(); // resume draining after any prior token expiry
       set({ user: res.user, token: res.access_token, loading: false });
-      // Register push token (best-effort) and pull offline bootstrap.
-      void registerPush();
+      // Register the device push token (best-effort) and pull offline bootstrap.
+      void registerPushToken();
       void runBootstrap().catch(() => {});
       void syncEngine.sync();
     } catch (e) {
@@ -108,12 +109,3 @@ export const useSession = create<SessionState>((set) => ({
     });
   },
 }));
-
-async function registerPush(): Promise<void> {
-  try {
-    const t = await bridge.getPushToken();
-    if (t?.token && navigator.onLine) await api.registerPushToken(t.token);
-  } catch {
-    /* best-effort */
-  }
-}

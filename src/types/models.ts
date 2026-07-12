@@ -261,14 +261,28 @@ export interface TodayRoute {
   outlets: Outlet[];
 }
 
+// Deep-link payload carried by a notification (and by the shell's `push.opened`
+// event). All keys optional; the app routes to the most specific target
+// available (route → outlet → order → today). The index signature tolerates
+// extra keys the backend may add (e.g. `type`).
+export interface NotificationData {
+  route?: string; // explicit in-app path, e.g. "/orders/abc"
+  outlet_id?: string;
+  order_id?: string;
+  visit_id?: string;
+  [k: string]: unknown;
+}
+
 export interface AppNotification {
   id: string;
-  tenant_id: string;
-  user_id: string;
+  // Present on some backends; optional so the pinned contract shape
+  // ({ id, type, title, body, data, read, created_at }) validates as-is.
+  tenant_id?: string;
+  user_id?: string;
   type: string;
   title: string;
   body: string;
-  data?: Record<string, unknown>;
+  data?: NotificationData;
   read: boolean;
   created_at: string;
 }

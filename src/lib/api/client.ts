@@ -15,6 +15,8 @@ import type {
   LoginResponse,
   MediaKind,
   MediaUploadResponse,
+  NotificationListResponse,
+  NotificationsQuery,
   OrderCreateRequest,
   OutcomeRequest,
   OutletCreateRequest,
@@ -25,7 +27,6 @@ import type {
   SyncMutation,
 } from '@/types/api';
 import type {
-  AppNotification,
   CatalogItem,
   Order,
   Outlet,
@@ -152,8 +153,8 @@ export const api = {
   me() {
     return request<User>('/auth/me');
   },
-  registerPushToken(token: string) {
-    return request<void>('/auth/push-token', { body: { token } });
+  registerPushToken(token: string, platform: string) {
+    return request<void>('/auth/push-token', { body: { token, platform } });
   },
   logout() {
     return request<void>('/auth/logout', { method: 'POST' });
@@ -281,11 +282,21 @@ export const api = {
   config() {
     return request<TenantConfig>('/config');
   },
-  notifications() {
-    return request<ListEnvelope<AppNotification>>('/notifications');
+  // Returns { items, unread_count }. Callers should tolerate a 404 (backend not
+  // yet shipped) — see features/notifications/data.ts, which degrades to empty.
+  notifications(query?: NotificationsQuery) {
+    return request<NotificationListResponse>('/notifications', {
+      query: {
+        unread_only: query?.unread_only,
+        limit: query?.limit,
+      },
+    });
   },
   markNotificationRead(id: string) {
     return request<void>(`/notifications/${id}/read`, { method: 'POST' });
+  },
+  markAllNotificationsRead() {
+    return request<void>('/notifications/read-all', { method: 'POST' });
   },
 
   // ---- Sync ----

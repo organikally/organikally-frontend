@@ -120,6 +120,16 @@ function handleIncoming(raw: unknown) {
   else p.reject(new Error(resp.error?.message || 'bridge error'));
 }
 
+// Tell the shell whether the web app handled an `app.backPressed` event. When
+// consumed=false the shell navigates the WebView back / exits, so the web must
+// NOT also navigate. No-op on a legacy shell / plain browser.
+export function reportBackConsumed(id: string, consumed: boolean): void {
+  const client = nativeClient() as
+    | { reportBackConsumed?: (id: string, consumed: boolean) => void }
+    | undefined;
+  client?.reportBackConsumed?.(id, consumed);
+}
+
 // Subscribe to a shell event. Returns an unsubscribe fn. Prefers the canonical
 // injected client's `.on`; otherwise uses the legacy-transport bus. In a plain
 // browser (no shell) this is an inert no-op — there are no native events.

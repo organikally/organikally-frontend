@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeftIcon } from '@/components/ui/icons';
 import { SyncIndicator } from './SyncIndicator';
+import { NotificationBell } from './NotificationBell';
 import type { ReactNode } from 'react';
 
 export function TopBar({
@@ -9,12 +10,16 @@ export function TopBar({
   back,
   right,
   showSync = true,
+  showBell = true,
 }: {
   title: ReactNode;
   subtitle?: ReactNode;
   back?: boolean;
   right?: ReactNode;
   showSync?: boolean;
+  // The header bell is shown by default; screens that already ARE the
+  // notifications view (or want a clean header) opt out.
+  showBell?: boolean;
 }) {
   const nav = useNavigate();
   return (
@@ -38,6 +43,7 @@ export function TopBar({
           )}
         </div>
         {right}
+        {showBell && <NotificationBell />}
         {showSync && <SyncIndicator />}
       </div>
     </header>

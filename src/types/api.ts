@@ -1,6 +1,7 @@
 // API request/response payload shapes — mirror CONTRACT §4 & §7.
 
 import type {
+  AppNotification,
   CatalogItem,
   GeoPoint,
   Order,
@@ -190,6 +191,24 @@ export interface SyncResult {
 
 export interface SyncBatchResponse {
   results: SyncResult[];
+}
+
+// Notifications — GET /notifications?unread_only=&limit=
+// Custom envelope (NOT the ListEnvelope): items + a top-level unread_count the
+// bell badge reads directly.
+export interface NotificationListResponse {
+  items: AppNotification[];
+  unread_count: number;
+}
+export interface NotificationsQuery {
+  unread_only?: boolean;
+  limit?: number;
+}
+
+// Push-token registration — POST /auth/push-token
+export interface PushTokenRequest {
+  token: string;
+  platform: string; // 'ios' | 'android' | 'web'
 }
 
 // Media upload — POST /media/upload

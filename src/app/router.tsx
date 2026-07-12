@@ -18,6 +18,7 @@ import { VisitOutcome } from '@/pages/VisitOutcome';
 import { Orders } from '@/pages/Orders';
 import { OrderDetail } from '@/pages/OrderDetail';
 import { SyncStatus } from '@/pages/SyncStatus';
+import { Notifications } from '@/pages/Notifications';
 
 // Pathless root layout: mounts native-bridge event wiring (deep-link push +
 // hardware back) inside the router so it has navigation available.
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
               { path: '/outlets', element: <Outlets /> },
               { path: '/route', element: <RouteView /> },
               { path: '/orders', element: <Orders /> },
+              { path: '/notifications', element: <Notifications /> },
               { path: '/sync', element: <SyncStatus /> },
             ],
           },
