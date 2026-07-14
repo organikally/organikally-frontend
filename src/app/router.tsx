@@ -1,5 +1,6 @@
 import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
+import { ROUTE } from './routePaths';
 import { useBridgeEvents } from '@/hooks/useBridgeEvents';
 import { AppShell } from '@/components/layout/AppShell';
 import { Login } from '@/pages/Login';
@@ -27,42 +28,44 @@ function RootLayout() {
   return <Outlet />;
 }
 
+// Paths come from `routePaths.ts` — the same list the notification deep-link
+// resolver validates against, so the two can never drift apart.
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: '/login', element: <Login /> },
+      { path: ROUTE.login, element: <Login /> },
       // Public — reachable pre-auth from the Login footer and onboarding consent.
-      { path: '/privacy', element: <Privacy /> },
+      { path: ROUTE.privacy, element: <Privacy /> },
       {
         element: <RequireAuth />,
         children: [
-      // Full-screen flows (no bottom nav)
-      { path: '/outlets/onboard', element: <OnboardOutlet /> },
-      { path: '/outlets/:id', element: <OutletDetail /> },
-      { path: '/outlets/:id/check-in', element: <CheckIn /> },
-      { path: '/visit/pitch', element: <VisitPitch /> },
-      { path: '/visit/catalog', element: <VisitCatalog /> },
-      { path: '/visit/order', element: <VisitOrder /> },
-      { path: '/visit/payment', element: <VisitPayment /> },
-      { path: '/visit/outcome', element: <VisitOutcome /> },
-          { path: '/orders/:id', element: <OrderDetail /> },
+          // Full-screen flows (no bottom nav)
+          { path: ROUTE.outletOnboard, element: <OnboardOutlet /> },
+          { path: ROUTE.outletDetail, element: <OutletDetail /> },
+          { path: ROUTE.outletCheckIn, element: <CheckIn /> },
+          { path: ROUTE.visitPitch, element: <VisitPitch /> },
+          { path: ROUTE.visitCatalog, element: <VisitCatalog /> },
+          { path: ROUTE.visitOrder, element: <VisitOrder /> },
+          { path: ROUTE.visitPayment, element: <VisitPayment /> },
+          { path: ROUTE.visitOutcome, element: <VisitOutcome /> },
+          { path: ROUTE.orderDetail, element: <OrderDetail /> },
           // Tabbed shell
           {
             element: <AppShell />,
             children: [
-              { index: true, element: <Navigate to="/today" replace /> },
-              { path: '/today', element: <Today /> },
-              { path: '/outlets', element: <Outlets /> },
-              { path: '/route', element: <RouteView /> },
-              { path: '/orders', element: <Orders /> },
-              { path: '/notifications', element: <Notifications /> },
-              { path: '/sync', element: <SyncStatus /> },
+              { index: true, element: <Navigate to={ROUTE.today} replace /> },
+              { path: ROUTE.today, element: <Today /> },
+              { path: ROUTE.outlets, element: <Outlets /> },
+              { path: ROUTE.routeView, element: <RouteView /> },
+              { path: ROUTE.orders, element: <Orders /> },
+              { path: ROUTE.notifications, element: <Notifications /> },
+              { path: ROUTE.sync, element: <SyncStatus /> },
             ],
           },
         ],
       },
-      { path: '*', element: <Navigate to="/today" replace /> },
+      { path: '*', element: <Navigate to={ROUTE.today} replace /> },
     ],
   },
 ]);

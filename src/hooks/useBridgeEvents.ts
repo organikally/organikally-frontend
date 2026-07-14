@@ -15,8 +15,10 @@ export function useBridgeEvents(): void {
   const qc = useQueryClient();
 
   useEffect(() => {
-    // Tapped a system notification. Routes via the SAME resolver the in-app
-    // list uses (data.route → outlet_id → order_id → today).
+    // Tapped a system notification. Routes via the SAME resolver the in-app list
+    // uses: data.route is accepted only if the router can actually match it,
+    // else order_id → outlet_id → the notifications list. A push can therefore
+    // never land the rep on a dead path (or off-app).
     const offOpened = onBridgeEvent('push.opened', (data) => {
       nav(notificationTarget((data ?? {}) as NotificationData));
     });

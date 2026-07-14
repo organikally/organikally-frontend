@@ -4,7 +4,17 @@ import { SyncIcon, WifiOffIcon, CheckIcon, AlertIcon } from '@/components/ui/ico
 import { cn } from '@/lib/cn';
 
 // Persistent offline/sync indicator (CONTRACT §8). Tap to open the Sync screen.
-export function SyncIndicator({ className }: { className?: string }) {
+//
+// `compact` drops the text label (icon + tone still carry the state, and the
+// label stays in the accessible name) so a header that also owns a screen title
+// and an action still reads at 320px.
+export function SyncIndicator({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   const { online, syncing, pending, errors } = useSyncState();
 
   let tone = 'bg-success/12 text-success';
@@ -33,14 +43,17 @@ export function SyncIndicator({ className }: { className?: string }) {
     <Link
       to="/sync"
       className={cn(
-        'pill tap !px-2.5',
+        'pill tap shrink-0',
+        compact ? '!px-2' : '!px-2.5',
         tone,
         className,
       )}
       aria-label={`Sync status: ${label}`}
     >
-      <Icon className={cn('h-4 w-4', syncing && 'animate-spin')} />
-      <span className="text-xs font-semibold">{label}</span>
+      <Icon className={cn('h-4 w-4 shrink-0', syncing && 'animate-spin')} />
+      <span className={cn('text-xs font-semibold', compact && 'sr-only')}>
+        {label}
+      </span>
     </Link>
   );
 }

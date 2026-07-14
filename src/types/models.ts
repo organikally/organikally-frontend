@@ -262,14 +262,16 @@ export interface TodayRoute {
 }
 
 // Deep-link payload carried by a notification (and by the shell's `push.opened`
-// event). All keys optional; the app routes to the most specific target
-// available (route → outlet → order → today). The index signature tolerates
-// extra keys the backend may add (e.g. `type`).
+// event). All keys optional. `route` is a HINT only — it is validated against the
+// app's real route table before use (see lib/notifications/deepLink.ts), then the
+// app falls back to order_id → outlet_id → the notifications list. The index
+// signature tolerates extra keys the backend adds (rep_id, sku_id, status, …).
 export interface NotificationData {
-  route?: string; // explicit in-app path, e.g. "/orders/abc"
+  route?: string; // suggested in-app path, e.g. "/orders/abc" — validated, not trusted
   outlet_id?: string;
   order_id?: string;
-  visit_id?: string;
+  visit_id?: string; // no standalone screen — resolves via outlet_id
+  payment_id?: string; // no standalone screen — resolves via outlet_id
   [k: string]: unknown;
 }
 

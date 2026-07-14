@@ -9,7 +9,10 @@ import {
 import { BellIcon, CheckCheckIcon } from '@/components/ui/icons';
 import { cn } from '@/lib/cn';
 import { relativeTime } from '@/lib/format';
-import { notificationTarget } from '@/lib/notifications/deepLink';
+import {
+  NOTIFICATIONS_ROUTE,
+  notificationTarget,
+} from '@/lib/notifications/deepLink';
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -36,30 +39,38 @@ export function Notifications() {
 
   function open(n: AppNotification) {
     if (!n.read) markRead.mutate(n.id);
-    nav(notificationTarget(n.data));
+    // The resolver only ever returns a path the router can match; when a
+    // notification has nothing addressable it resolves to this very screen, so
+    // marking it read is the whole interaction — don't push a no-op history entry.
+    const target = notificationTarget(n.data);
+    if (target !== NOTIFICATIONS_ROUTE) nav(target);
   }
 
   return (
     <div>
+      {/* No header action: "Mark all read" sits in the content area below, so the
+          title stays readable at 320px (it used to truncate to "Notifica…"). */}
       <TopBar
         title="Notifications"
-        subtitle={unread > 0 ? `${unread} unread` : undefined}
+        subtitle={unread > 0 ? `${unread} unread` : 'All caught up'}
         back
         showBell={false}
-        right={
-          unread > 0 ? (
-            <button
-              type="button"
-              onClick={() => markAll.mutate()}
-              disabled={markAll.isPending}
-              className="tap flex items-center gap-1 rounded-pill px-2 py-1 text-sm font-semibold text-gold-ink transition-colors duration-200 ease-brand active:bg-surface disabled:opacity-50"
-            >
-              <CheckCheckIcon className="h-4 w-4" />
-              <span>Mark all read</span>
-            </button>
-          ) : undefined
-        }
+        compactSync
       />
+
+      {unread > 0 && (
+        <div className="flex justify-end px-4 pt-4">
+          <button
+            type="button"
+            onClick={() => markAll.mutate()}
+            disabled={markAll.isPending}
+            className="tap inline-flex items-center gap-1.5 rounded-pill border border-line bg-paper px-3 py-1.5 text-sm font-semibold text-gold-ink transition-colors duration-200 ease-brand active:bg-surface disabled:opacity-50"
+          >
+            <CheckCheckIcon className="h-4 w-4 shrink-0" />
+            <span>Mark all read</span>
+          </button>
+        </div>
+      )}
 
       <div className="p-4">
         {isLoading ? (
@@ -73,7 +84,10 @@ export function Notifications() {
           <EmptyState
             icon={<BellIcon className="h-10 w-10" />}
             title="No notifications yet"
-            body="Approvals, order updates and route changes will show up here."
+            // Only the events the backend actually emits (app/services/notify.py):
+            // outlet.onboarded, visit.flagged_check_in, order.*, inventory.low_stock,
+            // receivable.overdue. No approvals, no route changes — don't promise them.
+            body="Order updates, flagged check-ins, newly onboarded outlets, low stock and overdue payments show up here."
           />
         ) : (
           <ul className="space-y-2.5">
